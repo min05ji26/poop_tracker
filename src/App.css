@@ -1,0 +1,35 @@
+#screen {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 60px 20px 24px;
+  box-sizing: border-box;
+  background: #fff8ed;
+}
+
+.greeting {
+  align-self: flex-start;
+  font-weight: 700;
+  font-size: 18px;
+  color: #3a2e22;
+}
+
+.greeting-name {
+  font-size: 24px;
+  color: #e8a33d;
+}
+
+.calendar-button {
+  width: 335px;
+  max-width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 18px;
+  background: #e8a33d;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
