@@ -6,23 +6,30 @@ const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 interface CalendarProps {
   onBack: () => void;
+  onNewRecord: () => void;
 }
 
 function toDateKey(date: Date): string {
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
-export function Calendar({ onBack }: CalendarProps) {
+export function Calendar({ onBack, onNewRecord }: CalendarProps) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
+  const [selectedDay, setSelectedDay] = useState<number | null>(
+    year === today.getFullYear() && month === today.getMonth() ? today.getDate() : null
+  );
   const [records, setRecords] = useState<PoopRecord[]>([]);
 
   useEffect(() => {
     loadRecords().then(setRecords);
   }, []);
 
-  const recordedDateKeys = new Set(records.map((record) => toDateKey(new Date(record.date))));
+  const recordsByDateKey = new Map<string, PoopRecord>();
+  for (const record of records) {
+    recordsByDateKey.set(toDateKey(new Date(record.date)), record);
+  }
 
   const firstWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -33,6 +40,8 @@ export function Calendar({ onBack }: CalendarProps) {
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
+  const selectedRecord = selectedDay === null ? undefined : recordsByDateKey.get(`${year}-${month}-${selectedDay}`);
+
   function goToPrevMonth() {
     if (month === 0) {
       setYear((y) => y - 1);
@@ -40,6 +49,7 @@ export function Calendar({ onBack }: CalendarProps) {
     } else {
       setMonth((m) => m - 1);
     }
+    setSelectedDay(null);
   }
 
   function goToNextMonth() {
@@ -49,6 +59,7 @@ export function Calendar({ onBack }: CalendarProps) {
     } else {
       setMonth((m) => m + 1);
     }
+    setSelectedDay(null);
   }
 
   return (
@@ -83,16 +94,41 @@ export function Calendar({ onBack }: CalendarProps) {
         <div className="day-grid">
           {cells.map((day, index) => {
             if (day === null) return <div key={index} className="day-cell" />;
-            const hasRecord = recordedDateKeys.has(`${year}-${month}-${day}`);
+            const hasRecord = recordsByDateKey.has(`${year}-${month}-${day}`);
+            const isSelected = day === selectedDay;
             return (
-              <div key={index} className="day-cell">
+              <button
+                type="button"
+                key={index}
+                className={`day-cell${isSelected ? ' day-cell-selected' : ''}`}
+                onClick={() => setSelectedDay(day)}
+              >
                 <span className="day-number">{day}</span>
                 {hasRecord && <span className="record-dot" />}
-              </div>
+              </button>
             );
           })}
         </div>
       </div>
+
+      {selectedDay !== null && (
+        <>
+          <p className="selected-date-title">선택한 날짜의 기록</p>
+          <div className="selected-date-detail">
+            {selectedRecord ? (
+              <p className="selected-date-text">
+                {selectedRecord.shape} · {selectedRecord.color}
+              </p>
+            ) : (
+              <p className="selected-date-text selected-date-empty">이 날은 기록이 없어요</p>
+            )}
+          </div>
+        </>
+      )}
+
+      <button type="button" className="new-record-fab" onClick={onNewRecord} aria-label="새 기록 추가">
+        +
+      </button>
     </div>
   );
 }

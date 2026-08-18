@@ -1,0 +1,35 @@
+.record-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.record-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+}
+
+.back-button {
+  border: none;
+  background: none;
+  font-size: 22px;
+  color: #8a7b6c;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.record-title {
+  font-weight: 700;
+  font-size: 22px;
+  color: #3a2e22;
+}
+
+.record-placeholder {
+  color: #8a7b6c;
+  font-size: 14px;
+}

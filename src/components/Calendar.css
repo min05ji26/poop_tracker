@@ -93,6 +93,17 @@
   justify-content: center;
   gap: 2px;
   height: 38px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.day-cell-selected {
+  background: #f8e0ba;
 }
 
 .day-number {
@@ -105,4 +116,51 @@
   height: 6px;
   border-radius: 50%;
   background: #e8a33d;
+}
+
+.selected-date-title {
+  align-self: flex-start;
+  font-weight: 700;
+  font-size: 14px;
+  color: #3a2e22;
+}
+
+.selected-date-detail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 335px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #efe6d8;
+  background: #fffdf9;
+}
+
+.selected-date-text {
+  font-size: 14px;
+  color: #3a2e22;
+}
+
+.selected-date-empty {
+  color: #8a7b6c;
+}
+
+.new-record-fab {
+  position: fixed;
+  right: max(24px, calc((100vw - 480px) / 2 + 24px));
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 28px;
+  background: #e8a33d;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Character } from './components/Character';
 import { Calendar } from './components/Calendar';
+import { Record } from './components/Record';
 import { getCharacterStatus } from './character';
 import { getLastRecordDate } from './storage';
 import './App.css';
 
-type Screen = 'home' | 'calendar';
+type Screen = 'home' | 'calendar' | 'record';
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home');
@@ -30,7 +31,10 @@ function App() {
           </button>
         </>
       )}
-      {screen === 'calendar' && <Calendar onBack={() => setScreen('home')} />}
+      {screen === 'calendar' && (
+        <Calendar onBack={() => setScreen('home')} onNewRecord={() => setScreen('record')} />
+      )}
+      {screen === 'record' && <Record onBack={() => setScreen('home')} />}
     </div>
   );
 }
