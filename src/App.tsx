@@ -11,12 +11,27 @@ type Screen = 'home' | 'calendar' | 'record';
 function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [status, setStatus] = useState(() => getCharacterStatus(null));
+  const [recordDate, setRecordDate] = useState(() => new Date());
 
   useEffect(() => {
+    refreshCharacterStatus();
+  }, []);
+
+  function refreshCharacterStatus() {
     getLastRecordDate().then((lastRecordDate) => {
       setStatus(getCharacterStatus(lastRecordDate));
     });
-  }, []);
+  }
+
+  function handleNewRecord(date: Date) {
+    setRecordDate(date);
+    setScreen('record');
+  }
+
+  function handleRecordSaved() {
+    refreshCharacterStatus();
+    setScreen('calendar');
+  }
 
   return (
     <div id="screen">
@@ -31,10 +46,10 @@ function App() {
           </button>
         </>
       )}
-      {screen === 'calendar' && (
-        <Calendar onBack={() => setScreen('home')} onNewRecord={() => setScreen('record')} />
+      {screen === 'calendar' && <Calendar onBack={() => setScreen('home')} onNewRecord={handleNewRecord} />}
+      {screen === 'record' && (
+        <Record date={recordDate} onBack={() => setScreen('calendar')} onSave={handleRecordSaved} />
       )}
-      {screen === 'record' && <Record onBack={() => setScreen('home')} />}
     </div>
   );
 }

@@ -6,27 +6,17 @@
   width: 100%;
 }
 
-.calendar-header-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.calendar-back-button {
   align-self: flex-start;
-}
-
-.back-button {
+  margin-left: -6px;
   border: none;
   background: none;
-  font-size: 22px;
-  color: #8a7b6c;
+  font-size: 32px;
+  font-weight: 900;
+  color: #3a2e22;
   cursor: pointer;
   padding: 0;
   line-height: 1;
-}
-
-.calendar-title {
-  font-weight: 700;
-  font-size: 22px;
-  color: #3a2e22;
 }
 
 .month-nav {
@@ -102,6 +92,10 @@
   cursor: pointer;
 }
 
+.day-cell-today {
+  border: 1.5px solid #e8a33d;
+}
+
 .day-cell-selected {
   background: #f8e0ba;
 }
@@ -115,7 +109,6 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #e8a33d;
 }
 
 .selected-date-title {
@@ -128,9 +121,9 @@
 .selected-date-detail {
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 335px;
   max-width: 100%;
+  min-height: 46px;
   box-sizing: border-box;
   padding: 14px 16px;
   border-radius: 16px;
@@ -138,9 +131,22 @@
   background: #fffdf9;
 }
 
+.selected-date-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
 .selected-date-text {
   font-size: 14px;
   color: #3a2e22;
+}
+
+.selected-date-memo {
+  font-size: 13px;
+  color: #8a7b6c;
+  white-space: pre-wrap;
 }
 
 .selected-date-empty {

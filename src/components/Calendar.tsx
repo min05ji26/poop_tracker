@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { loadRecords, type PoopRecord } from '../storage';
+import { getColorHex } from '../colorSwatches';
 import './Calendar.css';
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 interface CalendarProps {
   onBack: () => void;
-  onNewRecord: () => void;
+  onNewRecord: (date: Date) => void;
 }
 
 function toDateKey(date: Date): string {
@@ -17,9 +18,7 @@ export function Calendar({ onBack, onNewRecord }: CalendarProps) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
-  const [selectedDay, setSelectedDay] = useState<number | null>(
-    year === today.getFullYear() && month === today.getMonth() ? today.getDate() : null
-  );
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [records, setRecords] = useState<PoopRecord[]>([]);
 
   useEffect(() => {
@@ -62,14 +61,26 @@ export function Calendar({ onBack, onNewRecord }: CalendarProps) {
     setSelectedDay(null);
   }
 
+  function handleAddClick() {
+    const targetYear = selectedDay !== null ? year : today.getFullYear();
+    const targetMonth = selectedDay !== null ? month : today.getMonth();
+    const targetDay = selectedDay ?? today.getDate();
+    const targetDate = new Date(targetYear, targetMonth, targetDay);
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    if (targetDate.getTime() > todayMidnight.getTime()) {
+      alert(`오늘은 ${today.getDate()}일이고 이 날짜는 미래예요!`);
+      return;
+    }
+
+    onNewRecord(targetDate);
+  }
+
   return (
     <div className="calendar-screen">
-      <div className="calendar-header-row">
-        <button type="button" className="back-button" onClick={onBack} aria-label="홈으로">
-          ‹
-        </button>
-        <p className="calendar-title">지난 기록</p>
-      </div>
+      <button type="button" className="calendar-back-button" onClick={onBack} aria-label="홈으로">
+        ‹
+      </button>
 
       <div className="month-nav">
         <button type="button" className="month-nav-arrow" onClick={goToPrevMonth} aria-label="이전 달">
@@ -94,17 +105,18 @@ export function Calendar({ onBack, onNewRecord }: CalendarProps) {
         <div className="day-grid">
           {cells.map((day, index) => {
             if (day === null) return <div key={index} className="day-cell" />;
-            const hasRecord = recordsByDateKey.has(`${year}-${month}-${day}`);
+            const record = recordsByDateKey.get(`${year}-${month}-${day}`);
             const isSelected = day === selectedDay;
+            const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
             return (
               <button
                 type="button"
                 key={index}
-                className={`day-cell${isSelected ? ' day-cell-selected' : ''}`}
+                className={`day-cell${isToday ? ' day-cell-today' : ''}${isSelected ? ' day-cell-selected' : ''}`}
                 onClick={() => setSelectedDay(day)}
               >
                 <span className="day-number">{day}</span>
-                {hasRecord && <span className="record-dot" />}
+                {record && <span className="record-dot" style={{ backgroundColor: getColorHex(record.color) }} />}
               </button>
             );
           })}
@@ -116,9 +128,12 @@ export function Calendar({ onBack, onNewRecord }: CalendarProps) {
           <p className="selected-date-title">선택한 날짜의 기록</p>
           <div className="selected-date-detail">
             {selectedRecord ? (
-              <p className="selected-date-text">
-                {selectedRecord.shape} · {selectedRecord.color}
-              </p>
+              <div className="selected-date-info">
+                <p className="selected-date-text">
+                  {selectedRecord.shape} · {selectedRecord.color}
+                </p>
+                {selectedRecord.memo && <p className="selected-date-memo">{selectedRecord.memo}</p>}
+              </div>
             ) : (
               <p className="selected-date-text selected-date-empty">이 날은 기록이 없어요</p>
             )}
@@ -126,7 +141,7 @@ export function Calendar({ onBack, onNewRecord }: CalendarProps) {
         </>
       )}
 
-      <button type="button" className="new-record-fab" onClick={onNewRecord} aria-label="새 기록 추가">
+      <button type="button" className="new-record-fab" onClick={handleAddClick} aria-label="새 기록 추가">
         +
       </button>
     </div>
