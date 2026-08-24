@@ -34,8 +34,19 @@ export async function loadRecords(): Promise<PoopRecord[]> {
 
 export async function saveRecord(record: PoopRecord): Promise<void> {
   const records = await loadRecords();
-  records.push(record);
+  const index = records.findIndex((r) => r.id === record.id);
+  if (index === -1) {
+    records.push(record);
+  } else {
+    records[index] = record;
+  }
   await Storage.setItem(RECORDS_KEY, JSON.stringify(records));
+}
+
+export async function deleteRecord(id: string): Promise<void> {
+  const records = await loadRecords();
+  const filtered = records.filter((r) => r.id !== id);
+  await Storage.setItem(RECORDS_KEY, JSON.stringify(filtered));
 }
 
 export async function getLastRecordDate(): Promise<Date | null> {

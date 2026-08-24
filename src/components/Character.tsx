@@ -67,29 +67,35 @@ function CharacterFace({ mood, lookOffset }: { mood: CharacterMood; lookOffset: 
 export function Character({ mood, headline, subtext }: CharacterProps) {
   const faceWrapRef = useRef<HTMLDivElement>(null);
   const lookResetTimer = useRef<number>(undefined);
+  const bounceTimer = useRef<number>(undefined);
   const [lookOffset, setLookOffset] = useState<LookOffset>({ x: 0, y: 0 });
   const [isBouncing, setIsBouncing] = useState(false);
+
+  function triggerBounce() {
+    window.clearTimeout(bounceTimer.current);
+    setIsBouncing(false);
+    requestAnimationFrame(() => {
+      setIsBouncing(true);
+      bounceTimer.current = window.setTimeout(() => setIsBouncing(false), BOUNCE_DURATION_MS);
+    });
+  }
 
   // 불규칙한 간격으로 저절로 바운스
   useEffect(() => {
     let delayTimer: number;
-    let durationTimer: number;
 
     function scheduleNextBounce() {
       const delay = BOUNCE_DELAY_MIN_MS + Math.random() * (BOUNCE_DELAY_MAX_MS - BOUNCE_DELAY_MIN_MS);
       delayTimer = window.setTimeout(() => {
-        setIsBouncing(true);
-        durationTimer = window.setTimeout(() => {
-          setIsBouncing(false);
-          scheduleNextBounce();
-        }, BOUNCE_DURATION_MS);
+        triggerBounce();
+        scheduleNextBounce();
       }, delay);
     }
 
     scheduleNextBounce();
     return () => {
       window.clearTimeout(delayTimer);
-      window.clearTimeout(durationTimer);
+      window.clearTimeout(bounceTimer.current);
     };
   }, []);
 
@@ -127,7 +133,11 @@ export function Character({ mood, headline, subtext }: CharacterProps) {
 
   return (
     <div className="character-card">
-      <div ref={faceWrapRef} className={`character-face-wrap${isBouncing ? ' character-bounce' : ''}`}>
+      <div
+        ref={faceWrapRef}
+        className={`character-face-wrap${isBouncing ? ' character-bounce' : ''}`}
+        onPointerDown={triggerBounce}
+      >
         <CharacterFace mood={mood} lookOffset={lookOffset} />
       </div>
       <p className="character-headline">{headline}</p>

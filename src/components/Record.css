@@ -143,3 +143,21 @@
   color: #8a7b6c;
   cursor: not-allowed;
 }
+
+.delete-button {
+  width: 335px;
+  max-width: 100%;
+  height: 48px;
+  border: 1px solid #efe6d8;
+  border-radius: 18px;
+  background: none;
+  color: #bf5247;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.delete-button:disabled {
+  color: #8a7b6c;
+  cursor: not-allowed;
+}

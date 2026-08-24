@@ -4,7 +4,7 @@ import { Calendar } from './components/Calendar';
 import { Record } from './components/Record';
 import { Onboarding } from './components/Onboarding';
 import { getCharacterStatus } from './character';
-import { getLastRecordDate, loadProfile } from './storage';
+import { getLastRecordDate, loadProfile, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import './App.css';
 
@@ -14,6 +14,7 @@ function App() {
   const [screen, setScreen] = useState<Screen>('loading');
   const [status, setStatus] = useState(() => getCharacterStatus(null));
   const [recordDate, setRecordDate] = useState(() => new Date());
+  const [editingRecord, setEditingRecord] = useState<PoopRecord | null>(null);
   const [nickname, setNickname] = useState('');
   const [greetingMessage, setGreetingMessage] = useState(() => getRandomGreetingMessage());
 
@@ -45,12 +46,18 @@ function App() {
     goHome();
   }
 
-  function handleNewRecord(date: Date) {
+  function handleNewRecord(date: Date, existingRecord: PoopRecord | null) {
     setRecordDate(date);
+    setEditingRecord(existingRecord);
     setScreen('record');
   }
 
   function handleRecordSaved() {
+    refreshCharacterStatus();
+    setScreen('calendar');
+  }
+
+  function handleRecordDeleted() {
     refreshCharacterStatus();
     setScreen('calendar');
   }
@@ -71,7 +78,13 @@ function App() {
       )}
       {screen === 'calendar' && <Calendar onBack={goHome} onNewRecord={handleNewRecord} />}
       {screen === 'record' && (
-        <Record date={recordDate} onBack={() => setScreen('calendar')} onSave={handleRecordSaved} />
+        <Record
+          date={recordDate}
+          existingRecord={editingRecord}
+          onBack={() => setScreen('calendar')}
+          onSave={handleRecordSaved}
+          onDelete={handleRecordDeleted}
+        />
       )}
     </div>
   );

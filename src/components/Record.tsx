@@ -1,21 +1,24 @@
 import { useState } from 'react';
-import { SHAPE_LABELS, saveRecord, type PoopShape, type PoopColor } from '../storage';
+import { SHAPE_LABELS, saveRecord, deleteRecord, type PoopShape, type PoopColor, type PoopRecord } from '../storage';
 import { COLOR_SWATCHES } from '../colorSwatches';
 import './Record.css';
 
 interface RecordProps {
   date: Date;
+  existingRecord: PoopRecord | null;
   onBack: () => void;
   onSave: () => void;
+  onDelete: () => void;
 }
 
-export function Record({ date, onBack, onSave }: RecordProps) {
-  const [shape, setShape] = useState<PoopShape | null>(null);
-  const [color, setColor] = useState<PoopColor | null>(null);
-  const [memo, setMemo] = useState('');
+export function Record({ date, existingRecord, onBack, onSave, onDelete }: RecordProps) {
+  const [shape, setShape] = useState<PoopShape | null>(existingRecord?.shape ?? null);
+  const [color, setColor] = useState<PoopColor | null>(existingRecord?.color ?? null);
+  const [memo, setMemo] = useState(existingRecord?.memo ?? '');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const canSave = shape !== null && color !== null && !saving;
+  const canSave = shape !== null && color !== null && !saving && !deleting;
 
   const today = new Date();
   const isToday =
@@ -28,13 +31,21 @@ export function Record({ date, onBack, onSave }: RecordProps) {
     if (!shape || !color) return;
     setSaving(true);
     await saveRecord({
-      id: crypto.randomUUID(),
+      id: existingRecord?.id ?? crypto.randomUUID(),
       date: date.toISOString(),
       shape,
       color,
       memo: memo.trim() || undefined,
     });
     onSave();
+  }
+
+  async function handleDelete() {
+    if (!existingRecord) return;
+    if (!window.confirm('이 기록을 삭제할까요?')) return;
+    setDeleting(true);
+    await deleteRecord(existingRecord.id);
+    onDelete();
   }
 
   return (
@@ -95,6 +106,12 @@ export function Record({ date, onBack, onSave }: RecordProps) {
       <button type="button" className="save-button" disabled={!canSave} onClick={handleSave}>
         {saving ? '저장 중...' : '저장하기'}
       </button>
+
+      {existingRecord && (
+        <button type="button" className="delete-button" disabled={saving || deleting} onClick={handleDelete}>
+          {deleting ? '삭제 중...' : '삭제하기'}
+        </button>
+      )}
     </div>
   );
 }

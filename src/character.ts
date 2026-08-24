@@ -31,13 +31,13 @@ export function getCharacterStatus(lastRecordDate: Date | null): CharacterStatus
     return {
       mood: 'neutral',
       headline: `${daysSince}일째 소식이 없어요...`,
-      subtext: '오늘 기록하면 다시 활기 찾을지도?',
+      subtext: '오늘은 기록을 남기고 가는 건 어때요?',
     };
   }
 
   return {
     mood: 'sad',
     headline: `${daysSince}일째 소식이 없어요...`,
-    subtext: '많이 기다렸어요, 오늘 기록해줄래요?',
+    subtext: '끄응.. 속이 더부룩해요',
   };
 }

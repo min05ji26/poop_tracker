@@ -7,7 +7,7 @@ const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 interface CalendarProps {
   onBack: () => void;
-  onNewRecord: (date: Date) => void;
+  onNewRecord: (date: Date, existingRecord: PoopRecord | null) => void;
 }
 
 function toDateKey(date: Date): string {
@@ -73,7 +73,8 @@ export function Calendar({ onBack, onNewRecord }: CalendarProps) {
       return;
     }
 
-    onNewRecord(targetDate);
+    const existingRecord = recordsByDateKey.get(`${targetYear}-${targetMonth}-${targetDay}`) ?? null;
+    onNewRecord(targetDate, existingRecord);
   }
 
   return (
