@@ -44,3 +44,20 @@ export async function getLastRecordDate(): Promise<Date | null> {
   const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
   return new Date(sorted[0].date);
 }
+
+export interface Profile {
+  nickname: string;
+  birthdate: string; // YYYY.MM.DD
+}
+
+const PROFILE_KEY = 'poop_profile';
+
+export async function loadProfile(): Promise<Profile | null> {
+  const raw = await Storage.getItem(PROFILE_KEY);
+  if (!raw) return null;
+  return JSON.parse(raw) as Profile;
+}
+
+export async function saveProfile(profile: Profile): Promise<void> {
+  await Storage.setItem(PROFILE_KEY, JSON.stringify(profile));
+}
