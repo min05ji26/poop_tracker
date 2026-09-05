@@ -16,7 +16,7 @@ const FACE_STYLE: Record<CharacterMood, { bodyColor: string; blushOpacity: numbe
 
 const EYE_MOVE_RANGE = 4;
 const LOOK_RESET_DELAY_MS = 1200;
-const BOUNCE_DURATION_MS = 550;
+const BOUNCE_DURATION_MS = 420;
 const BOUNCE_DELAY_MIN_MS = 1500;
 const BOUNCE_DELAY_MAX_MS = 4500;
 

@@ -14,6 +14,7 @@ function App() {
   const [screen, setScreen] = useState<Screen>('loading');
   const [status, setStatus] = useState(() => getCharacterStatus(null));
   const [recordDate, setRecordDate] = useState(() => new Date());
+  const [calendarFocusDate, setCalendarFocusDate] = useState<Date | null>(null);
   const [editingRecord, setEditingRecord] = useState<PoopRecord | null>(null);
   const [nickname, setNickname] = useState('');
   const [greetingMessage, setGreetingMessage] = useState(() => getRandomGreetingMessage());
@@ -54,11 +55,13 @@ function App() {
 
   function handleRecordSaved() {
     refreshCharacterStatus();
+    setCalendarFocusDate(recordDate);
     setScreen('calendar');
   }
 
   function handleRecordDeleted() {
     refreshCharacterStatus();
+    setCalendarFocusDate(recordDate);
     setScreen('calendar');
   }
 
@@ -71,12 +74,21 @@ function App() {
             <span className="greeting-name">{nickname}</span>님, {greetingMessage}
           </p>
           <Character mood={status.mood} headline={status.headline} subtext={status.subtext} />
-          <button type="button" className="calendar-button" onClick={() => setScreen('calendar')}>
+          <button
+            type="button"
+            className="calendar-button"
+            onClick={() => {
+              setCalendarFocusDate(null);
+              setScreen('calendar');
+            }}
+          >
             달력 보기
           </button>
         </>
       )}
-      {screen === 'calendar' && <Calendar onBack={goHome} onNewRecord={handleNewRecord} />}
+      {screen === 'calendar' && (
+        <Calendar focusDate={calendarFocusDate} onBack={goHome} onNewRecord={handleNewRecord} />
+      )}
       {screen === 'record' && (
         <Record
           date={recordDate}

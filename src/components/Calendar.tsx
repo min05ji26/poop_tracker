@@ -6,6 +6,7 @@ import './Calendar.css';
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 interface CalendarProps {
+  focusDate?: Date | null;
   onBack: () => void;
   onNewRecord: (date: Date, existingRecord: PoopRecord | null) => void;
 }
@@ -14,11 +15,12 @@ function toDateKey(date: Date): string {
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
-export function Calendar({ onBack, onNewRecord }: CalendarProps) {
+export function Calendar({ focusDate, onBack, onNewRecord }: CalendarProps) {
   const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const initialDate = focusDate ?? today;
+  const [year, setYear] = useState(initialDate.getFullYear());
+  const [month, setMonth] = useState(initialDate.getMonth());
+  const [selectedDay, setSelectedDay] = useState<number | null>(focusDate ? focusDate.getDate() : null);
   const [records, setRecords] = useState<PoopRecord[]>([]);
 
   useEffect(() => {

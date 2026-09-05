@@ -31,7 +31,9 @@
 }
 
 #root {
-  max-width: 480px;
+  --app-max-width: 480px;
+  width: 100%;
+  max-width: var(--app-max-width);
   margin: 0 auto;
   min-height: 100svh;
   display: flex;
@@ -39,8 +41,20 @@
   box-sizing: border-box;
 }
 
+/* 태블릿(세로): 컬럼을 조금 더 넓게, 글자도 살짝 키움 */
+@media (min-width: 600px) {
+  :root {
+    font-size: 17px;
+  }
+  #root {
+    --app-max-width: 560px;
+  }
+}
+
 body {
   margin: 0;
+  /* 화면이 컨텐츠 폭보다 넓을 때 좌우 여백도 앱 배경색으로 채움 */
+  background: #fff8ed;
 }
 
 h1,

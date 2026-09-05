@@ -41,7 +41,7 @@
 }
 
 .character-bounce {
-  animation: character-bounce 0.7s cubic-bezier(0.36, 0, 0.66, 1);
+  animation: character-bounce 0.42s cubic-bezier(0.36, 0, 0.66, 1);
 }
 
 .character-headline {

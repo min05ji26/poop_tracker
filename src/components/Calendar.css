@@ -4,6 +4,7 @@
   align-items: center;
   gap: 20px;
   width: 100%;
+  margin-top: -28px;
 }
 
 .calendar-back-button {
@@ -23,8 +24,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 335px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 360px;
   height: 30px;
 }
 
@@ -49,8 +50,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 335px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 420px;
   box-sizing: border-box;
   padding: 18px 12px;
   border-radius: 20px;
@@ -121,8 +122,8 @@
 .selected-date-detail {
   display: flex;
   align-items: center;
-  width: 335px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 420px;
   min-height: 46px;
   box-sizing: border-box;
   padding: 14px 16px;
@@ -155,7 +156,7 @@
 
 .new-record-fab {
   position: fixed;
-  right: max(24px, calc((100vw - 480px) / 2 + 24px));
+  right: max(24px, calc((100vw - var(--app-max-width, 480px)) / 2 + 24px));
   bottom: 24px;
   width: 56px;
   height: 56px;
