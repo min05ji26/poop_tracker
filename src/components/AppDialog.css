@@ -1,0 +1,63 @@
+.app-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(58, 46, 34, 0.35);
+}
+
+.app-dialog-card {
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 20px 16px;
+  border-radius: 20px;
+  background: #fffdf9;
+  box-shadow: 0 12px 32px rgba(58, 46, 34, 0.2);
+}
+
+.app-dialog-message {
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #3a2e22;
+  white-space: pre-line;
+}
+
+.app-dialog-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.app-dialog-button {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.app-dialog-button-cancel {
+  background: #f0e9dd;
+  color: #6b5d4c;
+}
+
+.app-dialog-button-confirm {
+  background: #e8a33d;
+  color: #fff;
+}
+
+.app-dialog-button-danger {
+  background: #bf5247;
+}

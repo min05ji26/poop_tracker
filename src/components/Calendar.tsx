@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { loadRecords, type PoopRecord } from '../storage';
 import { getColorHex } from '../colorSwatches';
+import { AppDialog } from './AppDialog';
 import './Calendar.css';
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -22,6 +23,7 @@ export function Calendar({ focusDate, onBack, onNewRecord }: CalendarProps) {
   const [month, setMonth] = useState(initialDate.getMonth());
   const [selectedDay, setSelectedDay] = useState<number | null>(focusDate ? focusDate.getDate() : null);
   const [records, setRecords] = useState<PoopRecord[]>([]);
+  const [showFutureDialog, setShowFutureDialog] = useState(false);
 
   useEffect(() => {
     loadRecords().then(setRecords);
@@ -71,7 +73,7 @@ export function Calendar({ focusDate, onBack, onNewRecord }: CalendarProps) {
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     if (targetDate.getTime() > todayMidnight.getTime()) {
-      alert(`오늘은 ${today.getDate()}일이고 이 날짜는 미래예요!`);
+      setShowFutureDialog(true);
       return;
     }
 
@@ -147,6 +149,13 @@ export function Calendar({ focusDate, onBack, onNewRecord }: CalendarProps) {
       <button type="button" className="new-record-fab" onClick={handleAddClick} aria-label="새 기록 추가">
         +
       </button>
+
+      <AppDialog
+        open={showFutureDialog}
+        message={'아직 오지 않은 날이에요.\n오늘까지만 기록할 수 있어요.'}
+        confirmLabel="확인"
+        onConfirm={() => setShowFutureDialog(false)}
+      />
     </div>
   );
 }
