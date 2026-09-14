@@ -114,7 +114,7 @@ function App() {
         </>
       )}
       {screen === 'calendar' && (
-        <Calendar focusDate={calendarFocusDate} onBack={goHome} onNewRecord={handleNewRecord} />
+        <Calendar focusDate={calendarFocusDate} onNewRecord={handleNewRecord} />
       )}
       {screen === 'record' && (
         <Record

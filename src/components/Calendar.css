@@ -7,19 +7,6 @@
   margin-top: -28px;
 }
 
-.calendar-back-button {
-  align-self: flex-start;
-  margin-left: -6px;
-  border: none;
-  background: none;
-  font-size: 32px;
-  font-weight: 900;
-  color: #3a2e22;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
 .month-nav {
   display: flex;
   align-items: center;

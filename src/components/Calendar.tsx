@@ -8,7 +8,6 @@ const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 interface CalendarProps {
   focusDate?: Date | null;
-  onBack: () => void;
   onNewRecord: (date: Date, existingRecord: PoopRecord | null) => void;
 }
 
@@ -16,7 +15,7 @@ function toDateKey(date: Date): string {
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
-export function Calendar({ focusDate, onBack, onNewRecord }: CalendarProps) {
+export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
   const today = new Date();
   const initialDate = focusDate ?? today;
   const [year, setYear] = useState(initialDate.getFullYear());
@@ -83,10 +82,6 @@ export function Calendar({ focusDate, onBack, onNewRecord }: CalendarProps) {
 
   return (
     <div className="calendar-screen">
-      <button type="button" className="calendar-back-button" onClick={onBack} aria-label="홈으로">
-        ‹
-      </button>
-
       <div className="month-nav">
         <button type="button" className="month-nav-arrow" onClick={goToPrevMonth} aria-label="이전 달">
           ‹

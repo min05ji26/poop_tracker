@@ -36,7 +36,7 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
   const isDirtyRef = useRef(isDirty);
   isDirtyRef.current = isDirty;
 
-  // 화면 내 뒤로가기 버튼 · 토스 내비바 뒤로가기 둘 다 이 핸들러를 거침
+  // 토스 내비바 뒤로가기가 이 핸들러를 거침 (자체 뒤로가기 버튼은 심사 반려로 제거)
   const requestBack = useCallback(() => {
     if (isDirtyRef.current) {
       setShowLeaveDialog(true);
@@ -80,12 +80,6 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
 
   return (
     <div className="record-screen">
-      <div className="record-header-row">
-        <button type="button" className="back-button" onClick={requestBack} aria-label="뒤로">
-          ‹
-        </button>
-      </div>
-
       <p className="record-disclaimer">💡 진단이 아닌 참고·재미용 기록이에요</p>
       <p className="record-title">{title}</p>
 

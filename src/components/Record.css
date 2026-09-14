@@ -7,23 +7,6 @@
   margin-top: -28px;
 }
 
-.record-header-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-}
-
-.back-button {
-  border: none;
-  background: none;
-  font-size: 22px;
-  color: #8a7b6c;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
 .record-disclaimer {
   align-self: flex-start;
   font-size: 12px;
