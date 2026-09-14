@@ -1,10 +1,8 @@
 .calendar-screen {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
-  margin-top: -28px;
 }
 
 .month-nav {
@@ -12,149 +10,201 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 360px;
-  height: 30px;
 }
 
 .month-nav-arrow {
-  border: none;
-  background: none;
-  font-size: 18px;
-  color: #8a7b6c;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  font-size: 20px;
+  line-height: 1;
+  color: var(--color-text-sub);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 0 0 2px;
+}
+
+.month-label-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 .month-label {
-  flex: 1;
-  text-align: center;
   font-weight: 700;
-  font-size: 16px;
-  color: #3a2e22;
+  font-size: 18px;
+  color: var(--color-text);
+}
+
+.month-count {
+  font-size: 12px;
+  color: var(--color-text-sub);
 }
 
 .calendar-grid-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  max-width: 420px;
-  box-sizing: border-box;
-  padding: 18px 12px;
-  border-radius: 20px;
-  border: 1px solid #efe6d8;
-  background: #fffdf9;
+  gap: 8px;
+  padding: 16px 10px;
 }
 
 .weekday-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  padding-bottom: 4px;
 }
 
 .weekday-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: #8a7b6c;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-sub);
   text-align: center;
+}
+
+.weekday-label:first-child {
+  color: var(--color-danger);
 }
 
 .day-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  row-gap: 10px;
+  row-gap: 6px;
 }
 
 .day-cell {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  height: 38px;
+  justify-content: flex-start;
+  gap: 4px;
+  height: 46px;
   width: 100%;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  padding: 0;
+  padding: 6px 0 0;
   font: inherit;
   cursor: pointer;
 }
 
-.day-cell-today {
-  border: 1.5px solid #e8a33d;
+.day-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 22px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.day-cell-future .day-number {
+  color: var(--color-text-disabled);
+}
+
+.day-cell-today .day-number {
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
 }
 
 .day-cell-selected {
-  background: #f8e0ba;
-}
-
-.day-number {
-  font-size: 11px;
-  color: #8a7b6c;
+  background: var(--color-primary-soft);
 }
 
 .record-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--color-surface);
 }
 
 .selected-date-title {
-  align-self: flex-start;
+  margin-top: 4px;
   font-weight: 700;
-  font-size: 14px;
-  color: #3a2e22;
+  font-size: 15px;
+  color: var(--color-text);
 }
 
 .selected-date-detail {
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 420px;
-  min-height: 46px;
-  box-sizing: border-box;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid #efe6d8;
-  background: #fffdf9;
+  min-height: 56px;
+  padding: 16px;
+  border-radius: var(--radius-md);
 }
 
 .selected-date-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   width: 100%;
 }
 
-.selected-date-text {
-  font-size: 14px;
-  color: #3a2e22;
+.selected-date-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selected-date-swatch {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.selected-date-shape {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.selected-date-color {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+  font-size: 12px;
+  color: var(--color-text-sub);
 }
 
 .selected-date-memo {
-  font-size: 13px;
-  color: #8a7b6c;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border);
+  font-size: 14px;
+  color: var(--color-text-sub);
   white-space: pre-wrap;
 }
 
 .selected-date-empty {
-  color: #8a7b6c;
+  font-size: 14px;
+  color: var(--color-text-sub);
 }
 
 .new-record-fab {
   position: fixed;
-  right: max(24px, calc((100vw - var(--app-max-width, 480px)) / 2 + 24px));
-  bottom: 24px;
-  width: 56px;
-  height: 56px;
+  right: max(20px, calc((100vw - var(--app-max-width, 480px)) / 2 + 20px));
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  width: 60px;
+  height: 60px;
   border: none;
-  border-radius: 28px;
-  background: #e8a33d;
+  border-radius: 50%;
+  background: var(--color-primary);
   color: #fff;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 6px 16px rgba(232, 163, 61, 0.4);
+}
+
+.new-record-fab:active {
+  background: var(--color-primary-pressed);
 }

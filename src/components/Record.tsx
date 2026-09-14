@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SHAPE_LABELS, saveRecord, deleteRecord, type PoopShape, type PoopColor, type PoopRecord } from '../storage';
 import { COLOR_SWATCHES } from '../colorSwatches';
+import { SHAPE_DESCRIPTIONS } from '../shapeDescriptions';
 import { AppDialog } from './AppDialog';
 import './Record.css';
 
@@ -80,11 +81,13 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
 
   return (
     <div className="record-screen">
-      <p className="record-disclaimer">💡 진단이 아닌 참고·재미용 기록이에요</p>
-      <p className="record-title">{title}</p>
+      <div className="record-heading">
+        <p className="record-title">{title}</p>
+        <p className="disclaimer-pill">💡 진단이 아닌 참고·재미용 기록이에요</p>
+      </div>
 
-      <div className="record-section">
-        <p className="record-section-label">오늘 모양은 어땠나요?</p>
+      <section className="record-section card">
+        <p className="record-section-label">모양은 어땠나요?</p>
         <div className="shape-chip-grid">
           {SHAPE_LABELS.map((label) => (
             <button
@@ -92,55 +95,67 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
               key={label}
               className={`shape-chip${shape === label ? ' shape-chip-selected' : ''}`}
               onClick={() => setShape(label)}
+              aria-pressed={shape === label}
             >
-              {label}
+              <span className="shape-chip-name">{label}</span>
+              <span className="shape-chip-desc">{SHAPE_DESCRIPTIONS[label]}</span>
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      <div className="record-section">
+      <section className="record-section card">
         <p className="record-section-label">색은 어때요?</p>
         <div className="color-chip-row">
           {COLOR_SWATCHES.map(({ label, hex }) => (
             <button
               type="button"
               key={label}
-              className={`color-chip${hex === null ? ' color-chip-other' : ''}${color === label ? ' color-chip-selected' : ''}`}
-              style={hex ? { backgroundColor: hex } : undefined}
+              className={`color-chip${color === label ? ' color-chip-selected' : ''}`}
               onClick={() => setColor(label)}
-              aria-label={label}
+              aria-pressed={color === label}
             >
-              {hex === null && '?'}
+              <span
+                className={`color-chip-swatch${hex === null ? ' color-chip-swatch-other' : ''}`}
+                style={hex ? { backgroundColor: hex } : undefined}
+                aria-hidden="true"
+              >
+                {hex === null && '?'}
+              </span>
+              <span className="color-chip-label">{label}</span>
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      <div className="record-section">
-        <p className="record-section-label">메모 (선택)</p>
+      <section className="record-section card">
+        <p className="record-section-label">
+          메모 <span className="record-section-optional">선택</span>
+        </p>
         <textarea
           className="memo-input"
           placeholder="자유롭게 적어보세요"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
         />
-      </div>
+      </section>
 
-      <button type="button" className="save-button" disabled={!canSave} onClick={handleSave}>
-        {saving ? '저장 중...' : '저장하기'}
-      </button>
-
-      {existingRecord && (
-        <button
-          type="button"
-          className="delete-button"
-          disabled={saving || deleting}
-          onClick={() => setShowDeleteDialog(true)}
-        >
-          {deleting ? '삭제 중...' : '삭제하기'}
+      <div className="record-actions">
+        <button type="button" className="btn-primary" disabled={!canSave} onClick={handleSave}>
+          {saving ? '저장 중...' : '저장하기'}
         </button>
-      )}
+
+        {existingRecord && (
+          <button
+            type="button"
+            className="delete-button"
+            disabled={saving || deleting}
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            {deleting ? '삭제 중...' : '이 기록 삭제하기'}
+          </button>
+        )}
+      </div>
 
       <AppDialog
         open={showLeaveDialog}

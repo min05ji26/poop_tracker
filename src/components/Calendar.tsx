@@ -42,6 +42,9 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
+  const monthRecordCount = cells.filter((day) => day !== null && recordsByDateKey.has(`${year}-${month}-${day}`)).length;
+  const todayMidnightTime = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+
   const selectedRecord = selectedDay === null ? undefined : recordsByDateKey.get(`${year}-${month}-${selectedDay}`);
 
   function goToPrevMonth() {
@@ -86,15 +89,18 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
         <button type="button" className="month-nav-arrow" onClick={goToPrevMonth} aria-label="이전 달">
           ‹
         </button>
-        <p className="month-label">
-          {year}년 {month + 1}월
-        </p>
+        <div className="month-label-wrap">
+          <p className="month-label">
+            {year}년 {month + 1}월
+          </p>
+          <p className="month-count">{monthRecordCount}일 기록했어요</p>
+        </div>
         <button type="button" className="month-nav-arrow" onClick={goToNextMonth} aria-label="다음 달">
           ›
         </button>
       </div>
 
-      <div className="calendar-grid-card">
+      <div className="calendar-grid-card card">
         <div className="weekday-row">
           {WEEKDAY_LABELS.map((label) => (
             <span key={label} className="weekday-label">
@@ -108,11 +114,12 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
             const record = recordsByDateKey.get(`${year}-${month}-${day}`);
             const isSelected = day === selectedDay;
             const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
+            const isFuture = new Date(year, month, day).getTime() > todayMidnightTime;
             return (
               <button
                 type="button"
                 key={index}
-                className={`day-cell${isToday ? ' day-cell-today' : ''}${isSelected ? ' day-cell-selected' : ''}`}
+                className={`day-cell${isToday ? ' day-cell-today' : ''}${isSelected ? ' day-cell-selected' : ''}${isFuture ? ' day-cell-future' : ''}`}
                 onClick={() => setSelectedDay(day)}
               >
                 <span className="day-number">{day}</span>
@@ -125,17 +132,25 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
 
       {selectedDay !== null && (
         <>
-          <p className="selected-date-title">선택한 날짜의 기록</p>
-          <div className="selected-date-detail">
+          <p className="selected-date-title">
+            {month + 1}월 {selectedDay}일
+          </p>
+          <div className="selected-date-detail card">
             {selectedRecord ? (
               <div className="selected-date-info">
-                <p className="selected-date-text">
-                  {selectedRecord.shape} · {selectedRecord.color}
-                </p>
+                <div className="selected-date-row">
+                  <span
+                    className="selected-date-swatch"
+                    style={{ backgroundColor: getColorHex(selectedRecord.color) }}
+                    aria-hidden="true"
+                  />
+                  <p className="selected-date-shape">{selectedRecord.shape}</p>
+                  <p className="selected-date-color">{selectedRecord.color}</p>
+                </div>
                 {selectedRecord.memo && <p className="selected-date-memo">{selectedRecord.memo}</p>}
               </div>
             ) : (
-              <p className="selected-date-text selected-date-empty">이 날은 기록이 없어요</p>
+              <p className="selected-date-empty">이 날은 기록이 없어요</p>
             )}
           </div>
         </>

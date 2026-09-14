@@ -4,16 +4,35 @@ import { Calendar } from './components/Calendar';
 import { Record } from './components/Record';
 import { Onboarding } from './components/Onboarding';
 import { getCharacterStatus } from './character';
-import { getLastRecordDate, loadProfile, type PoopRecord } from './storage';
+import { getLastRecordDate, loadProfile, loadRecords, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
 
 type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record';
 
+interface HomeSummary {
+  recordedToday: boolean;
+  monthRecordDays: number;
+}
+
+function getHomeSummary(records: PoopRecord[]): HomeSummary {
+  const now = new Date();
+  const monthDays = new Set<number>();
+  let recordedToday = false;
+  for (const record of records) {
+    const date = new Date(record.date);
+    if (date.getFullYear() !== now.getFullYear() || date.getMonth() !== now.getMonth()) continue;
+    monthDays.add(date.getDate());
+    if (date.getDate() === now.getDate()) recordedToday = true;
+  }
+  return { recordedToday, monthRecordDays: monthDays.size };
+}
+
 function App() {
   const [screen, setScreen] = useState<Screen>('loading');
   const [status, setStatus] = useState(() => getCharacterStatus(null));
+  const [summary, setSummary] = useState<HomeSummary>({ recordedToday: false, monthRecordDays: 0 });
   const [recordDate, setRecordDate] = useState(() => new Date());
   const [calendarFocusDate, setCalendarFocusDate] = useState<Date | null>(null);
   const [editingRecord, setEditingRecord] = useState<PoopRecord | null>(null);
@@ -67,6 +86,7 @@ function App() {
     getLastRecordDate().then((lastRecordDate) => {
       setStatus(getCharacterStatus(lastRecordDate));
     });
+    loadRecords().then((records) => setSummary(getHomeSummary(records)));
   }
 
   function handleOnboardingComplete(newNickname: string) {
@@ -97,13 +117,29 @@ function App() {
       {screen === 'onboarding' && <Onboarding onComplete={handleOnboardingComplete} />}
       {screen === 'home' && (
         <>
-          <p className="greeting">
-            <span className="greeting-name">{nickname}</span>님, {greetingMessage}
-          </p>
+          <div className="home-header">
+            <p className="greeting-hello">
+              <span className="greeting-name">{nickname}</span>님, 안녕하세요
+            </p>
+            <p className="greeting-message">{greetingMessage}</p>
+          </div>
           <Character mood={status.mood} headline={status.headline} subtext={status.subtext} />
+          <div className="home-summary">
+            <div className="home-summary-item">
+              <span className="home-summary-label">오늘 기록</span>
+              <span className={`home-summary-value${summary.recordedToday ? ' home-summary-value-done' : ''}`}>
+                {summary.recordedToday ? '완료 ✓' : '아직이에요'}
+              </span>
+            </div>
+            <div className="home-summary-item">
+              <span className="home-summary-label">이번 달</span>
+              <span className="home-summary-value">{summary.monthRecordDays}일 기록</span>
+            </div>
+          </div>
+          <div className="home-spacer" />
           <button
             type="button"
-            className="calendar-button"
+            className="btn-primary"
             onClick={() => {
               setCalendarFocusDate(null);
               setScreen('calendar');

@@ -103,7 +103,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       <div className="onboarding-spacer" />
 
-      <button type="button" className="onboarding-start-button" disabled={!canSubmit} onClick={handleStart}>
+      <button type="button" className="btn-primary" disabled={!canSubmit} onClick={handleStart}>
         {saving ? '시작하는 중...' : '시작하기'}
       </button>
     </div>
