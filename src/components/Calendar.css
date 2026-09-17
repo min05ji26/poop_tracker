@@ -64,7 +64,11 @@
 }
 
 .weekday-label:first-child {
-  color: var(--color-danger);
+  color: var(--color-sunday);
+}
+
+.weekday-label:last-child {
+  color: var(--color-saturday);
 }
 
 .day-grid {
@@ -101,6 +105,15 @@
   color: var(--color-text);
 }
 
+/* 종이 달력처럼 일요일은 빨강, 토요일은 파랑 (7칸 그리드라 열 위치로 계산해요) */
+.day-cell:nth-child(7n + 1) .day-number {
+  color: var(--color-sunday);
+}
+
+.day-cell:nth-child(7n) .day-number {
+  color: var(--color-saturday);
+}
+
 .day-cell-future .day-number {
   color: var(--color-text-disabled);
 }
@@ -120,7 +133,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--color-surface);
+  box-shadow: 0 0 0 1.5px var(--color-surface-muted);
 }
 
 .selected-date-title {
@@ -167,7 +180,7 @@
 .selected-date-color {
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--color-surface-muted);
+  background: var(--color-surface);
   font-size: 12px;
   color: var(--color-text-sub);
 }
@@ -202,7 +215,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(232, 163, 61, 0.4);
+  box-shadow: 0 6px 16px rgba(43, 36, 32, 0.22);
 }
 
 .new-record-fab:active {

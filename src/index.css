@@ -1,21 +1,24 @@
 :root {
   /* 색 토큰 — 화면별 CSS 는 이 값만 참조해요 */
-  --color-bg: #fff8ed;
-  --color-surface: #fffdf9;
-  --color-surface-muted: #f6eee1;
-  --color-border: #efe6d8;
-  --color-text: #3a2e22;
-  --color-text-sub: #7a6b5b;
-  --color-text-disabled: #b3a697;
-  --color-primary: #e8a33d;
-  --color-primary-pressed: #d4902c;
-  --color-primary-soft: #fbe6c4;
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f3f1;
+  --color-border: #ece8e4;
+  --color-text: #2b2420;
+  --color-text-sub: #6b625b;
+  --color-text-disabled: #aaa29b;
+  --color-primary: #8b5e3c;
+  --color-primary-pressed: #754e31;
+  --color-primary-soft: #f3e7dc;
   --color-danger: #bf5247;
+  /* 달력 주말 */
+  --color-sunday: #d9453b;
+  --color-saturday: #3b6fd9;
 
   --radius-lg: 24px;
   --radius-md: 16px;
   --radius-sm: 12px;
-  --shadow-card: 0 2px 12px rgba(58, 46, 34, 0.06);
+  --shadow-card: 0 2px 12px rgba(43, 36, 32, 0.05);
 
   --sans: system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, sans-serif;
 
@@ -121,14 +124,13 @@ textarea {
   color: var(--color-text);
 }
 
-/* 공통 카드 */
+/* 공통 카드 — 흰 배경 위라 연회색으로 채워서 영역을 구분해요 */
 .card {
   width: 100%;
   box-sizing: border-box;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  background: var(--color-surface-muted);
 }
 
 /* "참고·재미용" 안내 뱃지 */

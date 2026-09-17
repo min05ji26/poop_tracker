@@ -136,7 +136,6 @@ function App() {
               <span className="home-summary-value">{summary.monthRecordDays}일 기록</span>
             </div>
           </div>
-          <div className="home-spacer" />
           <button
             type="button"
             className="btn-primary"

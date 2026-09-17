@@ -9,10 +9,14 @@ interface CharacterProps {
 }
 
 const FACE_STYLE: Record<CharacterMood, { bodyColor: string; blushOpacity: number }> = {
-  happy: { bodyColor: '#E0B583', blushOpacity: 0.7 },
-  neutral: { bodyColor: '#D4A574', blushOpacity: 0.55 },
-  sad: { bodyColor: '#C7B8A3', blushOpacity: 0.3 },
+  happy: { bodyColor: '#9A6A45', blushOpacity: 0.7 },
+  neutral: { bodyColor: '#8B5E3C', blushOpacity: 0.55 },
+  sad: { bodyColor: '#A89383', blushOpacity: 0.3 },
 };
+
+/* 위쪽이 살짝 뾰족한 물방울 몸통 (똥이라고 대놓고 말하지 않는 모양) */
+const BODY_PATH =
+  'M 90 10 C 104 48, 166 68, 166 114 C 166 152, 132 174, 90 174 C 48 174, 14 152, 14 114 C 14 68, 76 48, 90 10 Z';
 
 const EYE_MOVE_RANGE = 4;
 const LOOK_RESET_DELAY_MS = 1200;
@@ -30,13 +34,12 @@ function CharacterFace({ mood, lookOffset }: { mood: CharacterMood; lookOffset: 
 
   return (
     <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="90" cy="95" rx="85" ry="75" fill={bodyColor} />
-      <ellipse cx="90" cy="30" rx="35" ry="30" fill={bodyColor} />
+      <path d={BODY_PATH} fill={bodyColor} />
 
       {mood === 'sad' && (
         <>
-          <path d="M 66 68 L 78 73" stroke="#3A2E22" strokeWidth="3" strokeLinecap="round" />
-          <path d="M 114 68 L 102 73" stroke="#3A2E22" strokeWidth="3" strokeLinecap="round" />
+          <path d="M 64 94 L 78 100" stroke="#2B2420" strokeWidth="3" strokeLinecap="round" />
+          <path d="M 116 94 L 102 100" stroke="#2B2420" strokeWidth="3" strokeLinecap="round" />
         </>
       )}
 
@@ -46,19 +49,19 @@ function CharacterFace({ mood, lookOffset }: { mood: CharacterMood; lookOffset: 
           transition: 'transform 0.3s ease-out',
         }}
       >
-        <ellipse cx="75" cy="81" rx="5" ry="6" fill="#3A2E22" />
-        <ellipse cx="105" cy="81" rx="5" ry="6" fill="#3A2E22" />
+        <ellipse cx="74" cy="110" rx="5" ry="6" fill="#2B2420" />
+        <ellipse cx="106" cy="110" rx="5" ry="6" fill="#2B2420" />
       </g>
 
-      <ellipse opacity={blushOpacity} cx="52" cy="100" rx="8" ry="5" fill="#F2998C" />
-      <ellipse opacity={blushOpacity} cx="128" cy="100" rx="8" ry="5" fill="#F2998C" />
+      <ellipse opacity={blushOpacity} cx="48" cy="128" rx="9" ry="5.5" fill="#F2998C" />
+      <ellipse opacity={blushOpacity} cx="132" cy="128" rx="9" ry="5.5" fill="#F2998C" />
 
       {mood === 'happy' && (
-        <path d="M 79 101 Q 90 113 101 101" stroke="#3A2E22" strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M 79 130 Q 90 142 101 130" stroke="#2B2420" strokeWidth="5" strokeLinecap="round" fill="none" />
       )}
-      {mood === 'neutral' && <ellipse cx="90" cy="105" rx="11" ry="5" fill="#3A2E22" />}
+      {mood === 'neutral' && <ellipse cx="90" cy="133" rx="11" ry="5" fill="#2B2420" />}
       {mood === 'sad' && (
-        <path d="M 79 109 Q 90 99 101 109" stroke="#3A2E22" strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M 79 138 Q 90 128 101 138" stroke="#2B2420" strokeWidth="5" strokeLinecap="round" fill="none" />
       )}
     </svg>
   );
