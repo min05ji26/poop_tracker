@@ -85,19 +85,22 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
 
   return (
     <div className="calendar-screen">
-      <div className="month-nav">
-        <button type="button" className="month-nav-arrow" onClick={goToPrevMonth} aria-label="이전 달">
-          ‹
-        </button>
-        <div className="month-label-wrap">
+      <div className="month-label-wrap">
+        <div className="month-nav">
+          <button type="button" className="month-nav-arrow" onClick={goToPrevMonth} aria-label="이전 달">
+            ‹
+          </button>
           <p className="month-label">
             {year}년 {month + 1}월
           </p>
-          <p className="month-count">{monthRecordCount}일 기록했어요</p>
+          <button type="button" className="month-nav-arrow" onClick={goToNextMonth} aria-label="다음 달">
+            ›
+          </button>
         </div>
-        <button type="button" className="month-nav-arrow" onClick={goToNextMonth} aria-label="다음 달">
-          ›
-        </button>
+        <p className="month-count">
+          <span className="month-count-dot" aria-hidden="true" />
+          {monthRecordCount}일 기록했어요
+        </p>
       </div>
 
       <div className="calendar-grid-card card">
@@ -144,8 +147,8 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
                     style={{ backgroundColor: getColorHex(selectedRecord.color) }}
                     aria-hidden="true"
                   />
-                  <p className="selected-date-shape">{selectedRecord.shape}</p>
-                  <p className="selected-date-color">{selectedRecord.color}</p>
+                  <p className="selected-date-chip">{selectedRecord.shape}</p>
+                  <p className="selected-date-chip">{selectedRecord.color}</p>
                 </div>
                 {selectedRecord.memo && <p className="selected-date-memo">{selectedRecord.memo}</p>}
               </div>

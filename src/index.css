@@ -11,6 +11,10 @@
   --color-primary-pressed: #754e31;
   --color-primary-soft: #f3e7dc;
   --color-danger: #bf5247;
+  /* 핑크 포인트 (마스코트 볼터치, 작은 강조에만) */
+  --color-accent: #f2998c;
+  --color-accent-soft: #ffdad5;
+  --color-accent-strong: #924a40;
   /* 달력 주말 */
   --color-sunday: #d9453b;
   --color-saturday: #3b6fd9;

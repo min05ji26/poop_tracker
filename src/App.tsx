@@ -127,13 +127,22 @@ function App() {
           <div className="home-summary">
             <div className="home-summary-item">
               <span className="home-summary-label">오늘 기록</span>
-              <span className={`home-summary-value${summary.recordedToday ? ' home-summary-value-done' : ''}`}>
-                {summary.recordedToday ? '완료 ✓' : '아직이에요'}
-              </span>
+              {summary.recordedToday ? (
+                <span className="home-summary-value home-summary-value-done">
+                  완료
+                  <span className="home-summary-check" aria-hidden="true">
+                    ✓
+                  </span>
+                </span>
+              ) : (
+                <span className="home-summary-value">아직이에요</span>
+              )}
             </div>
             <div className="home-summary-item">
               <span className="home-summary-label">이번 달</span>
-              <span className="home-summary-value">{summary.monthRecordDays}일 기록</span>
+              <span className="home-summary-value">
+                {summary.monthRecordDays}일<span className="home-summary-unit">기록</span>
+              </span>
             </div>
           </div>
           <button

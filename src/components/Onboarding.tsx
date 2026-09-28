@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { saveProfile } from '../storage';
+import { CharacterFace } from './Character';
 import './Onboarding.css';
 
 interface OnboardingProps {
@@ -67,41 +68,54 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   return (
     <div className="onboarding-screen">
-      <div className="onboarding-intro">
-        <p className="onboarding-title">반가워요 👋</p>
-        <p className="onboarding-subtitle">몇 가지만 알려주면 시작할 수 있어요</p>
+      <div className="onboarding-body">
+        <div className="onboarding-intro">
+          <div className="onboarding-mascot" aria-hidden="true">
+            <CharacterFace mood="happy" size={88} />
+          </div>
+          <p className="onboarding-title">
+            반가워요!
+            <br />
+            나만의 편안한 하루를 시작해볼까요?
+          </p>
+          <p className="onboarding-subtitle">매일의 작은 습관으로 속 편한 일상을 기록해요.</p>
+        </div>
+
+        <div className="onboarding-form">
+          <label className="onboarding-section">
+            <span className="onboarding-label">닉네임</span>
+            <input
+              type="text"
+              className="onboarding-input"
+              placeholder="어떻게 불러드릴까요?"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+            />
+          </label>
+
+          <label className="onboarding-section">
+            <span className="onboarding-label">생년월일</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              className="onboarding-input"
+              placeholder="YYYY.MM.DD"
+              value={birthdateInput}
+              onChange={(e) => setBirthdateInput(formatBirthdateInput(e.target.value))}
+            />
+          </label>
+
+          {error ? (
+            <p className="onboarding-error">{error}</p>
+          ) : (
+            <p className="onboarding-disclaimer">
+              입력한 정보는 이 기기에만 저장돼요
+              <br />
+              생년월일은 만 {MIN_AGE}세 이상 확인에만 써요
+            </p>
+          )}
+        </div>
       </div>
-
-      <div className="onboarding-section">
-        <p className="onboarding-label">닉네임</p>
-        <input
-          type="text"
-          className="onboarding-input"
-          placeholder="사용할 닉네임을 입력해주세요"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-        />
-      </div>
-
-      <div className="onboarding-section">
-        <p className="onboarding-label">생년월일</p>
-        <input
-          type="text"
-          inputMode="numeric"
-          className="onboarding-input"
-          placeholder="YYYY.MM.DD"
-          value={birthdateInput}
-          onChange={(e) => setBirthdateInput(formatBirthdateInput(e.target.value))}
-        />
-      </div>
-
-      {error ? (
-        <p className="onboarding-error">{error}</p>
-      ) : (
-        <p className="onboarding-disclaimer">💡 생년월일은 만 {MIN_AGE}세 이상 확인 용도로만 사용돼요</p>
-      )}
-
-      <div className="onboarding-spacer" />
 
       <button type="button" className="btn-primary" disabled={!canSubmit} onClick={handleStart}>
         {saving ? '시작하는 중...' : '시작하기'}

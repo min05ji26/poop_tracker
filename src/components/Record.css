@@ -71,8 +71,32 @@
 }
 
 .shape-chip-selected {
+  position: relative;
   border-color: var(--color-primary);
   background: var(--color-primary-soft);
+}
+
+/* 색만으로 구분하지 않도록 선택한 칩에 체크 표시 */
+.shape-chip-selected::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* 마지막 칩(물똥)이 혼자 남으면 한 줄을 다 써요 */
+.shape-chip:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 /* 색: 동그라미 + 이름 */
@@ -110,6 +134,17 @@
 }
 
 /* 카드색 틈 + 갈색 테두리라 어두운 색 위에서도 선택이 잘 보여요 */
+.color-chip-selected .color-chip-swatch::after {
+  content: '✓';
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.color-chip-selected .color-chip-swatch-other::after {
+  content: none;
+}
+
 .color-chip-selected .color-chip-swatch {
   box-shadow:
     0 0 0 3px var(--color-surface-muted),

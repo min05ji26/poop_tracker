@@ -10,15 +10,17 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  max-width: 320px;
 }
 
 .month-nav-arrow {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--color-border);
+  width: 48px;
+  height: 48px;
+  border: none;
   border-radius: 50%;
-  background: var(--color-surface);
-  font-size: 20px;
+  background: transparent;
+  font-size: 28px;
+  font-weight: 600;
   line-height: 1;
   color: var(--color-text-sub);
   cursor: pointer;
@@ -29,25 +31,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 8px;
 }
 
 .month-label {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 22px;
+  letter-spacing: -0.01em;
   color: var(--color-text);
 }
 
 .month-count {
-  font-size: 12px;
-  color: var(--color-text-sub);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-primary);
+}
+
+.month-count-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
 }
 
 .calendar-grid-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px 10px;
+  padding: 16px 12px;
 }
 
 .weekday-row {
@@ -57,7 +75,7 @@
 }
 
 .weekday-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-sub);
   text-align: center;
@@ -74,7 +92,7 @@
 .day-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  row-gap: 6px;
+  row-gap: 4px;
 }
 
 .day-cell {
@@ -82,25 +100,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 4px;
-  height: 46px;
-  width: 100%;
-  border: none;
+  height: 44px;
+  width: 38px;
+  justify-self: center;
+  box-sizing: border-box;
+  border: 2px solid transparent;
   border-radius: var(--radius-sm);
   background: transparent;
-  padding: 6px 0 0;
+  padding: 0;
   font: inherit;
   cursor: pointer;
 }
 
 .day-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 22px;
-  font-size: 14px;
+  line-height: 1;
+  font-size: 16px;
   font-weight: 500;
   color: var(--color-text);
 }
@@ -118,28 +134,57 @@
   color: var(--color-text-disabled);
 }
 
-.day-cell-today .day-number {
-  border-radius: 999px;
+/* 기록 점이 없는 날도 숫자 위치가 같도록 자리를 잡아둬요 */
+.day-cell::after {
+  content: '';
+  height: 6px;
+}
+
+.day-cell:has(.record-dot)::after {
+  display: none;
+}
+
+/* 선택한 날: 테두리 네모 */
+.day-cell-selected {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.day-cell-selected .day-number {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* 오늘: 채운 네모 (선택보다 우선) */
+.day-cell-today,
+.day-cell-today.day-cell-selected {
+  border-color: var(--color-primary);
   background: var(--color-primary);
+}
+
+.day-cell-today .day-number,
+.day-cell-today.day-cell-selected .day-number {
   color: #fff;
   font-weight: 700;
 }
 
-.day-cell-selected {
-  background: var(--color-primary-soft);
+.record-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
 }
 
-.record-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--color-surface-muted);
+/* 오늘 칸 위에서는 점을 핑크로 바꿔서 잘 보이게 */
+.day-cell-today .record-dot {
+  background-color: var(--color-accent-soft) !important;
 }
 
 .selected-date-title {
-  margin-top: 4px;
+  margin-top: 8px;
+  padding: 0 4px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 20px;
+  letter-spacing: -0.01em;
   color: var(--color-text);
 }
 
@@ -161,35 +206,37 @@
 .selected-date-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .selected-date-swatch {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
   border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--color-surface);
 }
 
-.selected-date-shape {
-  font-weight: 700;
-  font-size: 15px;
+.selected-date-chip {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-weight: 600;
+  font-size: 14px;
   color: var(--color-text);
 }
 
-.selected-date-color {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  font-size: 12px;
-  color: var(--color-text-sub);
-}
-
 .selected-date-memo {
-  padding-top: 10px;
-  border-top: 1px dashed var(--color-border);
-  font-size: 14px;
-  color: var(--color-text-sub);
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text);
   white-space: pre-wrap;
 }
 
