@@ -1,7 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { SHAPE_LABELS, saveRecord, deleteRecord, type PoopShape, type PoopColor, type PoopRecord } from '../storage';
+import {
+  DURATION_LABELS,
+  SHAPE_LABELS,
+  SMELL_LABELS,
+  saveRecord,
+  deleteRecord,
+  type PoopShape,
+  type PoopColor,
+  type PoopDuration,
+  type PoopRecord,
+  type PoopSmell,
+} from '../storage';
 import { COLOR_SWATCHES } from '../colorSwatches';
 import { SHAPE_DESCRIPTIONS } from '../shapeDescriptions';
+import { DURATION_HINTS, SMELL_EMOJIS } from '../extraOptions';
 import { combineDateAndTime, isFutureTime, toTimeInputValue } from '../recordTime';
 import { AppDialog } from './AppDialog';
 import './Record.css';
@@ -18,7 +30,13 @@ interface RecordProps {
 export function Record({ date, existingRecord, onBack, registerBackHandler, onSave, onDelete }: RecordProps) {
   const [shape, setShape] = useState<PoopShape | null>(existingRecord?.shape ?? null);
   const [color, setColor] = useState<PoopColor | null>(existingRecord?.color ?? null);
+  const [duration, setDuration] = useState<PoopDuration | null>(existingRecord?.duration ?? null);
+  const [smell, setSmell] = useState<PoopSmell | null>(existingRecord?.smell ?? null);
   const [memo, setMemo] = useState(existingRecord?.memo ?? '');
+  // 선택 항목은 접어두고, 이미 적어둔 값이 있는 기록을 열 때만 펼쳐서 보여줌
+  const [showMore, setShowMore] = useState(
+    Boolean(existingRecord?.duration || existingRecord?.smell || existingRecord?.memo),
+  );
   // 새 기록은 지금 시각, 시각 있는 기록은 그 시각, 시각 없는 v1 기록은 빈 칸
   const [initialTime] = useState(() => {
     if (!existingRecord) return toTimeInputValue(new Date());
@@ -40,6 +58,8 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
     (shape !== (existingRecord?.shape ?? null) ||
       color !== (existingRecord?.color ?? null) ||
       time !== initialTime ||
+      duration !== (existingRecord?.duration ?? null) ||
+      smell !== (existingRecord?.smell ?? null) ||
       memo.trim() !== (existingRecord?.memo ?? ''));
 
   // 뒤로가기 시점의 최신 isDirty 를 읽기 위한 ref (내비바 뒤로가기 핸들러가 stale 값을 보지 않도록)
@@ -77,6 +97,8 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
       hasTime: time !== '',
       shape,
       color,
+      duration: duration ?? undefined,
+      smell: smell ?? undefined,
       memo: memo.trim() || undefined,
     });
     onSave();
@@ -156,17 +178,76 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
         </div>
       </section>
 
-      <section className="record-section card">
-        <p className="record-section-label">
-          메모 <span className="record-section-optional">선택</span>
-        </p>
-        <textarea
-          className="memo-input"
-          placeholder="자유롭게 적어보세요"
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-        />
-      </section>
+      <button
+        type="button"
+        className="more-toggle"
+        onClick={() => setShowMore((open) => !open)}
+        aria-expanded={showMore}
+      >
+        더 기록하기 <span className="record-section-optional">걸린 시간 · 냄새 · 메모</span>
+        <span className={`more-toggle-arrow${showMore ? ' more-toggle-arrow-open' : ''}`} aria-hidden="true">
+          ▾
+        </span>
+      </button>
+
+      {showMore && (
+        <>
+          <section className="record-section card">
+            <p className="record-section-label">
+              얼마나 걸렸나요? <span className="record-section-optional">선택</span>
+            </p>
+            <div className="option-chip-row option-chip-row-4">
+              {DURATION_LABELS.map((label) => (
+                <button
+                  type="button"
+                  key={label}
+                  className={`option-chip${duration === label ? ' option-chip-selected' : ''}`}
+                  // 선택 항목이라 한 번 더 누르면 선택 해제
+                  onClick={() => setDuration(duration === label ? null : label)}
+                  aria-pressed={duration === label}
+                >
+                  <span className="option-chip-name">{label}</span>
+                  <span className="option-chip-desc">{DURATION_HINTS[label]}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="record-section card">
+            <p className="record-section-label">
+              냄새는요? <span className="record-section-optional">선택</span>
+            </p>
+            <div className="option-chip-row option-chip-row-5">
+              {SMELL_LABELS.map((label) => (
+                <button
+                  type="button"
+                  key={label}
+                  className={`option-chip${smell === label ? ' option-chip-selected' : ''}`}
+                  onClick={() => setSmell(smell === label ? null : label)}
+                  aria-pressed={smell === label}
+                >
+                  <span className="option-chip-emoji" aria-hidden="true">
+                    {SMELL_EMOJIS[label]}
+                  </span>
+                  <span className="option-chip-desc">{label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="record-section card">
+            <p className="record-section-label">
+              메모 <span className="record-section-optional">선택</span>
+            </p>
+            <textarea
+              className="memo-input"
+              placeholder="자유롭게 적어보세요"
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+            />
+          </section>
+        </>
+      )}
 
       <div className="record-actions">
         <button type="button" className="btn-primary" disabled={!canSave} onClick={handleSave}>

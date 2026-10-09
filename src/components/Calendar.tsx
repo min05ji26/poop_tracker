@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { loadRecords, type PoopRecord } from '../storage';
 import { getColorHex } from '../colorSwatches';
 import { formatRecordTime, groupRecordsByDate } from '../calendarData';
+import { SMELL_EMOJIS } from '../extraOptions';
 import { AppDialog } from './AppDialog';
 import './Calendar.css';
 
@@ -169,6 +170,12 @@ export function Calendar({ focusDate, onNewRecord, onEditRecord }: CalendarProps
                         />
                         <p className="selected-date-chip">{record.shape}</p>
                         <p className="selected-date-chip">{record.color}</p>
+                        {record.duration && <p className="selected-date-chip">⏱ {record.duration}</p>}
+                        {record.smell && (
+                          <p className="selected-date-chip">
+                            {SMELL_EMOJIS[record.smell]} {record.smell}
+                          </p>
+                        )}
                       </div>
                       {record.memo && <p className="selected-date-memo">{record.memo}</p>}
                     </div>

@@ -16,12 +16,24 @@ export const COLOR_LABELS = ['갈색', '황토색', '검정', '붉은기', '녹�
 
 export type PoopColor = (typeof COLOR_LABELS)[number];
 
+// 걸린 시간·냄새는 선택 항목 (기록 안 해도 저장 가능)
+export const DURATION_LABELS = ['순삭', '보통', '오래', '사투'] as const;
+
+export type PoopDuration = (typeof DURATION_LABELS)[number];
+
+// 냄새는 재미용 기록. 통계·AI 리포트 분석에는 쓰지 않음
+export const SMELL_LABELS = ['거의 없음', '무난', '쿰쿰', '독함', '생화학 무기'] as const;
+
+export type PoopSmell = (typeof SMELL_LABELS)[number];
+
 export interface PoopRecord {
   id: string;
   date: string; // ISO string
   hasTime: boolean; // false면 시각을 모르는 기록(v1) → date는 그날 0시, 날짜 단위 통계에만 사용
   shape: PoopShape;
   color: PoopColor;
+  duration?: PoopDuration; // optional
+  smell?: PoopSmell; // optional
   memo?: string; // optional
 }
 

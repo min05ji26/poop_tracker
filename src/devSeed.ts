@@ -1,5 +1,5 @@
 import { Storage } from '@apps-in-toss/web-framework';
-import { COLOR_LABELS, SHAPE_LABELS, type PoopRecord } from './storage';
+import { COLOR_LABELS, DURATION_LABELS, SHAPE_LABELS, SMELL_LABELS, type PoopRecord } from './storage';
 
 // 개발 모드 전용: 달력·통계 화면 확인용 샘플 기록 생성 (main.tsx에서 DEV일 때만 연결)
 
@@ -34,6 +34,8 @@ const SHAPE_WEIGHTS = [1, 2, 6, 5, 2, 1, 0.5];
 const COLOR_WEIGHTS = [8, 3, 0.5, 0.3, 0.5, 0.3];
 // 하루 기록 횟수 0~3회 비율
 const DAILY_COUNT_WEIGHTS = [3, 6, 2, 0.5];
+// 순삭~사투 순서
+const DURATION_WEIGHTS = [4, 5, 2, 0.5];
 const SAMPLE_MEMOS = ['물 많이 마심', '야식 먹음', '배가 살짝 아팠음', '커피 두 잔'];
 
 export interface SampleOptions {
@@ -61,6 +63,9 @@ export function generateSampleRecords({ days = 90, seed = 1, now = new Date() }:
         hasTime: true,
         shape: pickWeighted(SHAPE_LABELS, SHAPE_WEIGHTS, random),
         color: pickWeighted(COLOR_LABELS, COLOR_WEIGHTS, random),
+        // 선택 항목이라 일부 기록에만 채움
+        duration: random() < 0.6 ? pickWeighted(DURATION_LABELS, DURATION_WEIGHTS, random) : undefined,
+        smell: random() < 0.3 ? SMELL_LABELS[Math.floor(random() * SMELL_LABELS.length)] : undefined,
         memo: random() < 0.15 ? SAMPLE_MEMOS[Math.floor(random() * SAMPLE_MEMOS.length)] : undefined,
       });
     }

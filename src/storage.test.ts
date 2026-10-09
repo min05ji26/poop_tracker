@@ -57,6 +57,26 @@ describe('migrateRecords', () => {
     expect(records.find((r) => r.id === 'c')).toEqual(newRecord);
   });
 
+  it('걸린 시간·냄새가 있는 기록도 그대로 유지하고, 없는 기록은 빈 값으로 둔다', async () => {
+    const withExtras = {
+      id: 'x',
+      date: new Date(2026, 9, 3, 9, 0).toISOString(),
+      hasTime: true,
+      shape: '바나나똥',
+      color: '갈색',
+      duration: '오래',
+      smell: '쿰쿰',
+    } as const;
+    await storeV1Records();
+    await saveRecord(withExtras);
+    await migrateRecords();
+
+    const records = await loadRecords();
+    expect(records.find((r) => r.id === 'x')).toEqual(withExtras);
+    expect(records.find((r) => r.id === 'a')?.duration).toBeUndefined();
+    expect(records.find((r) => r.id === 'a')?.smell).toBeUndefined();
+  });
+
   it('기록이 없는 신규 사용자도 오류 없이 버전만 표시한다', async () => {
     await migrateRecords();
 
