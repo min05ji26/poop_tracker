@@ -19,17 +19,37 @@ export type PoopColor = (typeof COLOR_LABELS)[number];
 export interface PoopRecord {
   id: string;
   date: string; // ISO string
+  hasTime: boolean; // false면 시각을 모르는 기록(v1) → date는 그날 0시, 날짜 단위 통계에만 사용
   shape: PoopShape;
   color: PoopColor;
   memo?: string; // optional
 }
 
 const RECORDS_KEY = 'poop_records';
+const RECORDS_VERSION_KEY = 'poop_records_version';
+const CURRENT_RECORDS_VERSION = '2';
+
+// v1 기록에는 hasTime이 없음 → 시각을 모르는 기록으로 취급
+function normalizeRecord(record: Omit<PoopRecord, 'hasTime'> & { hasTime?: boolean }): PoopRecord {
+  return { ...record, hasTime: record.hasTime ?? false };
+}
 
 export async function loadRecords(): Promise<PoopRecord[]> {
   const raw = await Storage.getItem(RECORDS_KEY);
   if (!raw) return [];
-  return JSON.parse(raw) as PoopRecord[];
+  return (JSON.parse(raw) as PoopRecord[]).map(normalizeRecord);
+}
+
+// 앱 시작 시 한 번 실행. 기존 기록은 지우지 않고 v2 형식으로 다시 저장한다
+export async function migrateRecords(): Promise<void> {
+  if ((await Storage.getItem(RECORDS_VERSION_KEY)) === CURRENT_RECORDS_VERSION) return;
+
+  const raw = await Storage.getItem(RECORDS_KEY);
+  if (raw) {
+    const records = await loadRecords();
+    await Storage.setItem(RECORDS_KEY, JSON.stringify(records));
+  }
+  await Storage.setItem(RECORDS_VERSION_KEY, CURRENT_RECORDS_VERSION);
 }
 
 export async function saveRecord(record: PoopRecord): Promise<void> {

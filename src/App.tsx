@@ -4,7 +4,7 @@ import { Calendar } from './components/Calendar';
 import { Record } from './components/Record';
 import { Onboarding } from './components/Onboarding';
 import { getCharacterStatus } from './character';
-import { getLastRecordDate, loadProfile, loadRecords, type PoopRecord } from './storage';
+import { getLastRecordDate, loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
@@ -43,7 +43,7 @@ function App() {
   const recordBackRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    refreshCharacterStatus();
+    migrateRecords().then(refreshCharacterStatus);
     loadProfile().then((profile) => {
       if (profile) {
         setNickname(profile.nickname);

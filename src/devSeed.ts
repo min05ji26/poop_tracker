@@ -4,6 +4,7 @@ import { COLOR_LABELS, SHAPE_LABELS, type PoopRecord } from './storage';
 // 개발 모드 전용: 달력·통계 화면 확인용 샘플 기록 생성 (main.tsx에서 DEV일 때만 연결)
 
 const RECORDS_KEY = 'poop_records';
+const RECORDS_VERSION_KEY = 'poop_records_version';
 
 // 같은 seed면 항상 같은 기록이 나오도록 하는 간단한 난수 생성기 (mulberry32)
 function createRandom(seed: number): () => number {
@@ -57,6 +58,7 @@ export function generateSampleRecords({ days = 90, seed = 1, now = new Date() }:
       records.push({
         id: `sample-${offset}-${i}`,
         date: date.toISOString(),
+        hasTime: true,
         shape: pickWeighted(SHAPE_LABELS, SHAPE_WEIGHTS, random),
         color: pickWeighted(COLOR_LABELS, COLOR_WEIGHTS, random),
         memo: random() < 0.15 ? SAMPLE_MEMOS[Math.floor(random() * SAMPLE_MEMOS.length)] : undefined,
@@ -71,6 +73,21 @@ export function generateSampleRecords({ days = 90, seed = 1, now = new Date() }:
 export async function seedSampleRecords(options?: SampleOptions): Promise<number> {
   const records = generateSampleRecords(options);
   await Storage.setItem(RECORDS_KEY, JSON.stringify(records));
+  return records.length;
+}
+
+// 마이그레이션 확인용: v1 형식(그날 0시, hasTime 없음, 하루 1개)으로 덮어쓰고 버전 표시를 지운다
+// → 새로고침하면 앱 시작 시 마이그레이션이 다시 실행됨
+export async function seedLegacyRecords(options?: SampleOptions): Promise<number> {
+  const byDay = new Map<string, Omit<PoopRecord, 'hasTime'>>();
+  for (const { hasTime: _hasTime, ...record } of generateSampleRecords(options)) {
+    const date = new Date(record.date);
+    const midnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    byDay.set(midnight.toISOString(), { ...record, date: midnight.toISOString() });
+  }
+  const records = [...byDay.values()];
+  await Storage.setItem(RECORDS_KEY, JSON.stringify(records));
+  await Storage.removeItem(RECORDS_VERSION_KEY);
   return records.length;
 }
 

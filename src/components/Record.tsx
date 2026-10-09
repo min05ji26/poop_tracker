@@ -61,9 +61,13 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
   async function handleSave() {
     if (!shape || !color) return;
     setSaving(true);
+    // 새 기록은 고른 날짜에 지금 시각을 붙여 저장, 기존 기록 수정 시에는 원래 시각(또는 시각 없음)을 유지
+    const now = new Date();
+    const recordedAt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), now.getHours(), now.getMinutes());
     await saveRecord({
       id: existingRecord?.id ?? crypto.randomUUID(),
-      date: date.toISOString(),
+      date: existingRecord?.date ?? recordedAt.toISOString(),
+      hasTime: existingRecord?.hasTime ?? true,
       shape,
       color,
       memo: memo.trim() || undefined,
