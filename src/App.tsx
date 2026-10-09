@@ -94,9 +94,15 @@ function App() {
     goHome();
   }
 
-  function handleNewRecord(date: Date, existingRecord: PoopRecord | null) {
+  function handleNewRecord(date: Date) {
     setRecordDate(date);
-    setEditingRecord(existingRecord);
+    setEditingRecord(null);
+    setScreen('record');
+  }
+
+  function handleEditRecord(date: Date, record: PoopRecord) {
+    setRecordDate(date);
+    setEditingRecord(record);
     setScreen('record');
   }
 
@@ -158,7 +164,7 @@ function App() {
         </>
       )}
       {screen === 'calendar' && (
-        <Calendar focusDate={calendarFocusDate} onNewRecord={handleNewRecord} />
+        <Calendar focusDate={calendarFocusDate} onNewRecord={handleNewRecord} onEditRecord={handleEditRecord} />
       )}
       {screen === 'record' && (
         <Record

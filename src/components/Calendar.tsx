@@ -11,10 +11,11 @@ const MAX_DOTS = 3;
 
 interface CalendarProps {
   focusDate?: Date | null;
-  onNewRecord: (date: Date, existingRecord: PoopRecord | null) => void;
+  onNewRecord: (date: Date) => void;
+  onEditRecord: (date: Date, record: PoopRecord) => void;
 }
 
-export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
+export function Calendar({ focusDate, onNewRecord, onEditRecord }: CalendarProps) {
   const today = new Date();
   const initialDate = focusDate ?? today;
   const [year, setYear] = useState(initialDate.getFullYear());
@@ -77,8 +78,8 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
       return;
     }
 
-    const existingRecord = recordsByDateKey.get(`${targetYear}-${targetMonth}-${targetDay}`)?.[0] ?? null;
-    onNewRecord(targetDate, existingRecord);
+    // 그날 기록이 있어도 + 는 항상 새 기록 (기존 기록 수정은 목록 카드에서)
+    onNewRecord(targetDate);
   }
 
   return (
@@ -154,7 +155,7 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
                   <button
                     type="button"
                     className="selected-date-item card"
-                    onClick={() => onNewRecord(new Date(year, month, selectedDay), record)}
+                    onClick={() => onEditRecord(new Date(year, month, selectedDay), record)}
                   >
                     <div className="selected-date-info">
                       <p className={`selected-date-time${record.hasTime ? '' : ' selected-date-time-unknown'}`}>
