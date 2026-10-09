@@ -38,6 +38,48 @@
   color: var(--color-text-sub);
 }
 
+/* 시각: 라벨 왼쪽, 입력 칸 오른쪽 한 줄 */
+.time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.time-input {
+  min-width: 120px;
+  height: 44px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  padding: 0 12px;
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.time-input-invalid,
+.time-input-invalid:focus {
+  border-color: var(--color-danger);
+}
+
+.time-hint {
+  margin-top: -6px;
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.time-hint-error {
+  color: var(--color-danger);
+}
+
 /* 모양: 2열 카드형 칩 (이름 + 짧은 설명) */
 .shape-chip-grid {
   display: grid;

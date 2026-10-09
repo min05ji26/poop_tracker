@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { SHAPE_LABELS, saveRecord, deleteRecord, type PoopShape, type PoopColor, type PoopRecord } from '../storage';
 import { COLOR_SWATCHES } from '../colorSwatches';
 import { SHAPE_DESCRIPTIONS } from '../shapeDescriptions';
+import { combineDateAndTime, isFutureTime, toTimeInputValue } from '../recordTime';
 import { AppDialog } from './AppDialog';
 import './Record.css';
 
@@ -18,12 +19,19 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
   const [shape, setShape] = useState<PoopShape | null>(existingRecord?.shape ?? null);
   const [color, setColor] = useState<PoopColor | null>(existingRecord?.color ?? null);
   const [memo, setMemo] = useState(existingRecord?.memo ?? '');
+  // 새 기록은 지금 시각, 시각 있는 기록은 그 시각, 시각 없는 v1 기록은 빈 칸
+  const [initialTime] = useState(() => {
+    if (!existingRecord) return toTimeInputValue(new Date());
+    return existingRecord.hasTime ? toTimeInputValue(new Date(existingRecord.date)) : '';
+  });
+  const [time, setTime] = useState(initialTime);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const canSave = shape !== null && color !== null && !saving && !deleting;
+  const timeIsFuture = isFutureTime(date, time);
+  const canSave = shape !== null && color !== null && !timeIsFuture && !saving && !deleting;
 
   // 저장하지 않은 입력이 하나라도 있으면 "기록 중"으로 간주 (뒤로가기 시 확인용)
   const isDirty =
@@ -31,6 +39,7 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
     !deleting &&
     (shape !== (existingRecord?.shape ?? null) ||
       color !== (existingRecord?.color ?? null) ||
+      time !== initialTime ||
       memo.trim() !== (existingRecord?.memo ?? ''));
 
   // 뒤로가기 시점의 최신 isDirty 를 읽기 위한 ref (내비바 뒤로가기 핸들러가 stale 값을 보지 않도록)
@@ -61,13 +70,11 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
   async function handleSave() {
     if (!shape || !color) return;
     setSaving(true);
-    // 새 기록은 고른 날짜에 지금 시각을 붙여 저장, 기존 기록 수정 시에는 원래 시각(또는 시각 없음)을 유지
-    const now = new Date();
-    const recordedAt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), now.getHours(), now.getMinutes());
+    // 시각 칸을 비우면 시각 모르는 기록(그날 0시)으로 저장
     await saveRecord({
       id: existingRecord?.id ?? crypto.randomUUID(),
-      date: existingRecord?.date ?? recordedAt.toISOString(),
-      hasTime: existingRecord?.hasTime ?? true,
+      date: combineDateAndTime(date, time).toISOString(),
+      hasTime: time !== '',
       shape,
       color,
       memo: memo.trim() || undefined,
@@ -89,6 +96,23 @@ export function Record({ date, existingRecord, onBack, registerBackHandler, onSa
         <p className="record-title">{title}</p>
         <p className="disclaimer-pill">💡 진단이 아닌 참고·재미용 기록이에요</p>
       </div>
+
+      <section className="record-section card">
+        <div className="time-row">
+          <label className="record-section-label" htmlFor="record-time">
+            몇 시에 갔나요?
+          </label>
+          <input
+            id="record-time"
+            type="time"
+            className={`time-input${timeIsFuture ? ' time-input-invalid' : ''}`}
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
+        {timeIsFuture && <p className="time-hint time-hint-error">아직 오지 않은 시각이에요</p>}
+        {!timeIsFuture && time === '' && <p className="time-hint">시각을 몰라도 괜찮아요. 비워두고 저장할 수 있어요</p>}
+      </section>
 
       <section className="record-section card">
         <p className="record-section-label">모양은 어땠나요?</p>
