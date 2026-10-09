@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  /* 목록 마지막 기록이 + 버튼에 가리지 않도록 */
+  padding-bottom: 84px;
 }
 
 .month-nav {
@@ -140,7 +142,7 @@
   height: 6px;
 }
 
-.day-cell:has(.record-dot)::after {
+.day-cell:has(.record-marks)::after {
   display: none;
 }
 
@@ -168,10 +170,30 @@
   font-weight: 700;
 }
 
+.record-marks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 6px;
+}
+
 .record-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+}
+
+/* 4회 이상은 점 대신 숫자 */
+.record-count {
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.day-cell-today .record-count {
+  color: var(--color-accent-soft);
 }
 
 /* 오늘 칸 위에서는 점을 핑크로 바꿔서 잘 보이게 */
@@ -186,6 +208,58 @@
   font-size: 20px;
   letter-spacing: -0.01em;
   color: var(--color-text);
+}
+
+.selected-date-count {
+  margin-left: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.selected-date-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 기록 한 개 = 탭하면 수정 화면으로 가는 카드 */
+.selected-date-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.selected-date-item:active {
+  background: var(--color-border);
+}
+
+.selected-date-time {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.selected-date-time-unknown {
+  font-weight: 500;
+  color: var(--color-text-sub);
+}
+
+.selected-date-edit {
+  flex-shrink: 0;
+  padding-top: 1px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-text-sub);
 }
 
 .selected-date-detail {

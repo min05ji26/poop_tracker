@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import { loadRecords, type PoopRecord } from '../storage';
 import { getColorHex } from '../colorSwatches';
+import { formatRecordTime, groupRecordsByDate } from '../calendarData';
 import { AppDialog } from './AppDialog';
 import './Calendar.css';
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+// 날짜 칸에 점으로 보여줄 최대 횟수. 넘으면 숫자로 표시
+const MAX_DOTS = 3;
 
 interface CalendarProps {
   focusDate?: Date | null;
   onNewRecord: (date: Date, existingRecord: PoopRecord | null) => void;
-}
-
-function toDateKey(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
 export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
@@ -28,10 +27,7 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
     loadRecords().then(setRecords);
   }, []);
 
-  const recordsByDateKey = new Map<string, PoopRecord>();
-  for (const record of records) {
-    recordsByDateKey.set(toDateKey(new Date(record.date)), record);
-  }
+  const recordsByDateKey = groupRecordsByDate(records);
 
   const firstWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -42,10 +38,12 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const monthRecordCount = cells.filter((day) => day !== null && recordsByDateKey.has(`${year}-${month}-${day}`)).length;
+  const monthDayRecords = cells.flatMap((day) => (day === null ? [] : [recordsByDateKey.get(`${year}-${month}-${day}`) ?? []]));
+  const monthRecordDays = monthDayRecords.filter((dayRecords) => dayRecords.length > 0).length;
+  const monthRecordTotal = monthDayRecords.reduce((sum, dayRecords) => sum + dayRecords.length, 0);
   const todayMidnightTime = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-  const selectedRecord = selectedDay === null ? undefined : recordsByDateKey.get(`${year}-${month}-${selectedDay}`);
+  const selectedRecords = selectedDay === null ? [] : (recordsByDateKey.get(`${year}-${month}-${selectedDay}`) ?? []);
 
   function goToPrevMonth() {
     if (month === 0) {
@@ -79,7 +77,7 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
       return;
     }
 
-    const existingRecord = recordsByDateKey.get(`${targetYear}-${targetMonth}-${targetDay}`) ?? null;
+    const existingRecord = recordsByDateKey.get(`${targetYear}-${targetMonth}-${targetDay}`)?.[0] ?? null;
     onNewRecord(targetDate, existingRecord);
   }
 
@@ -99,7 +97,7 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
         </div>
         <p className="month-count">
           <span className="month-count-dot" aria-hidden="true" />
-          {monthRecordCount}일 기록했어요
+          {monthRecordDays}일 · {monthRecordTotal}회 기록했어요
         </p>
       </div>
 
@@ -114,7 +112,7 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
         <div className="day-grid">
           {cells.map((day, index) => {
             if (day === null) return <div key={index} className="day-cell" />;
-            const record = recordsByDateKey.get(`${year}-${month}-${day}`);
+            const dayRecords = recordsByDateKey.get(`${year}-${month}-${day}`) ?? [];
             const isSelected = day === selectedDay;
             const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
             const isFuture = new Date(year, month, day).getTime() > todayMidnightTime;
@@ -126,7 +124,17 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
                 onClick={() => setSelectedDay(day)}
               >
                 <span className="day-number">{day}</span>
-                {record && <span className="record-dot" style={{ backgroundColor: getColorHex(record.color) }} />}
+                {dayRecords.length > 0 && (
+                  <span className="record-marks" aria-label={`${dayRecords.length}회 기록`}>
+                    {dayRecords.length > MAX_DOTS ? (
+                      <span className="record-count">{dayRecords.length}</span>
+                    ) : (
+                      dayRecords.map((record) => (
+                        <span key={record.id} className="record-dot" style={{ backgroundColor: getColorHex(record.color) }} />
+                      ))
+                    )}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -137,25 +145,44 @@ export function Calendar({ focusDate, onNewRecord }: CalendarProps) {
         <>
           <p className="selected-date-title">
             {month + 1}월 {selectedDay}일
+            {selectedRecords.length > 0 && <span className="selected-date-count">{selectedRecords.length}회</span>}
           </p>
-          <div className="selected-date-detail card">
-            {selectedRecord ? (
-              <div className="selected-date-info">
-                <div className="selected-date-row">
-                  <span
-                    className="selected-date-swatch"
-                    style={{ backgroundColor: getColorHex(selectedRecord.color) }}
-                    aria-hidden="true"
-                  />
-                  <p className="selected-date-chip">{selectedRecord.shape}</p>
-                  <p className="selected-date-chip">{selectedRecord.color}</p>
-                </div>
-                {selectedRecord.memo && <p className="selected-date-memo">{selectedRecord.memo}</p>}
-              </div>
-            ) : (
+          {selectedRecords.length > 0 ? (
+            <ul className="selected-date-list">
+              {selectedRecords.map((record) => (
+                <li key={record.id}>
+                  <button
+                    type="button"
+                    className="selected-date-item card"
+                    onClick={() => onNewRecord(new Date(year, month, selectedDay), record)}
+                  >
+                    <div className="selected-date-info">
+                      <p className={`selected-date-time${record.hasTime ? '' : ' selected-date-time-unknown'}`}>
+                        {formatRecordTime(record)}
+                      </p>
+                      <div className="selected-date-row">
+                        <span
+                          className="selected-date-swatch"
+                          style={{ backgroundColor: getColorHex(record.color) }}
+                          aria-hidden="true"
+                        />
+                        <p className="selected-date-chip">{record.shape}</p>
+                        <p className="selected-date-chip">{record.color}</p>
+                      </div>
+                      {record.memo && <p className="selected-date-memo">{record.memo}</p>}
+                    </div>
+                    <span className="selected-date-edit" aria-hidden="true">
+                      수정
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="selected-date-detail card">
               <p className="selected-date-empty">이 날은 기록이 없어요</p>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
 
