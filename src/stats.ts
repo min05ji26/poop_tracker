@@ -8,8 +8,9 @@ const HOUR_MS = 60 * 60 * 1000;
 export const WINDOW_DAYS = 60; // 최근 60일 기록만 사용
 export const MAX_INTERVAL_HOURS = 7 * 24; // 7일 넘는 간격은 '기록을 잊은 것'으로 보고 제외
 export const MIN_INTERVALS = 10; // 간격이 이보다 적으면 개인 기준을 믿기 어려움
-export const LATE_MULTIPLIER = 1.5; // 주의 기준 배수 (초기값, 시뮬레이션으로 확정 예정)
-export const WAY_LATE_MULTIPLIER = 2.5; // 한참 기준 배수 (초기값)
+// 배수는 scripts/simulateThresholds.ts 시뮬레이션으로 확정 (평범한 사용자 기준 😐 월 1.2회, 😢 월 0.45회)
+export const LATE_MULTIPLIER = 2.0; // 주의 기준 배수
+export const WAY_LATE_MULTIPLIER = 3.0; // 한참 기준 배수
 
 // 최근 기록 사이 간격(시간 단위). 시각을 모르는 기록(v1)이 낀 간격은 정확하지 않아 뺀다
 export function getIntervalHours(records: PoopRecord[], now: Date = new Date()): number[] {
@@ -52,8 +53,8 @@ export interface GapStatus {
   intervalCount: number;
   meanHours: number | null; // 데이터 부족이면 null
   sdHours: number | null;
-  lateThresholdHours: number | null; // 평균 + 1.5 × 표준편차
-  wayLateThresholdHours: number | null; // 평균 + 2.5 × 표준편차
+  lateThresholdHours: number | null; // 평균 + 2.0 × 표준편차
+  wayLateThresholdHours: number | null; // 평균 + 3.0 × 표준편차
 }
 
 export interface GapMultipliers {

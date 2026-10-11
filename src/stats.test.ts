@@ -88,7 +88,7 @@ describe('getGapStatus', () => {
   });
 
   describe('매일 비슷한 시각에 가는 사용자 (규칙적)', () => {
-    // 평균 24시간, 표준편차 2시간 → 주의 27시간 / 한참 29시간
+    // 평균 24시간, 표준편차 2시간 → 주의 28시간 / 한참 30시간
     const records = recordsFromIntervals(start, [22, 26, 22, 26, 22, 26, 22, 26, 22, 26, 24]);
     const last = new Date(records[records.length - 1].date).getTime();
     const at = (hours: number) => getGapStatus(records, new Date(last + hours * HOUR));
@@ -98,15 +98,15 @@ describe('getGapStatus', () => {
       expect(status.intervalCount).toBe(11);
       expect(status.meanHours).toBe(24);
       expect(status.sdHours).toBeCloseTo(2, 5);
-      expect(status.lateThresholdHours).toBeCloseTo(27, 5);
-      expect(status.wayLateThresholdHours).toBeCloseTo(29, 5);
+      expect(status.lateThresholdHours).toBeCloseTo(28, 5);
+      expect(status.wayLateThresholdHours).toBeCloseTo(30, 5);
     });
 
     it('기준에 따라 평소 → 늦음 → 한참으로 바뀐다', () => {
-      expect(at(26).level).toBe('usual');
-      expect(at(27).level).toBe('usual'); // 기준과 같으면 아직 평소
-      expect(at(28).level).toBe('late');
-      expect(at(30).level).toBe('wayLate');
+      expect(at(27).level).toBe('usual');
+      expect(at(28).level).toBe('usual'); // 기준과 같으면 아직 평소
+      expect(at(29).level).toBe('late');
+      expect(at(31).level).toBe('wayLate');
     });
   });
 
@@ -121,9 +121,9 @@ describe('getGapStatus', () => {
       expect(at(72).level).toBe('usual');
     });
 
-    it('평균 + 1.5배 표준편차를 넘으면 늦음, 2.5배를 넘으면 한참', () => {
-      expect(at(48 + 1.5 * sd + 1).level).toBe('late');
-      expect(at(48 + 2.5 * sd + 1).level).toBe('wayLate');
+    it('평균 + 2배 표준편차를 넘으면 늦음, 3배를 넘으면 한참', () => {
+      expect(at(48 + 2 * sd + 1).level).toBe('late');
+      expect(at(48 + 3 * sd + 1).level).toBe('wayLate');
     });
   });
 
@@ -138,9 +138,9 @@ describe('getGapStatus', () => {
   it('배수를 바꿔서 판정할 수 있다 (임계값 시뮬레이션용)', () => {
     const records = recordsFromIntervals(start, [22, 26, 22, 26, 22, 26, 22, 26, 22, 26, 24]);
     const last = new Date(records[records.length - 1].date).getTime();
-    const now = new Date(last + 28 * HOUR);
+    const now = new Date(last + 29 * HOUR);
     expect(getGapStatus(records, now).level).toBe('late');
-    expect(getGapStatus(records, now, { late: 2, wayLate: 3 }).level).toBe('usual');
+    expect(getGapStatus(records, now, { late: 3, wayLate: 4 }).level).toBe('usual');
   });
 
   it('긴 공백(7일 초과)은 기준 계산에서 빠지지만 경과 시간에는 반영된다', () => {
