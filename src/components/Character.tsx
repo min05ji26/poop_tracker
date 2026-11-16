@@ -6,6 +6,7 @@ interface CharacterProps {
   mood: CharacterMood;
   headline: string;
   subtext: string;
+  hint?: string;
 }
 
 const FACE_STYLE: Record<CharacterMood, { bodyColor: string; highlightColor: string; blushOpacity: number }> = {
@@ -86,7 +87,7 @@ export function CharacterFace({
   );
 }
 
-export function Character({ mood, headline, subtext }: CharacterProps) {
+export function Character({ mood, headline, subtext, hint }: CharacterProps) {
   const faceWrapRef = useRef<HTMLDivElement>(null);
   const lookResetTimer = useRef<number>(undefined);
   const bounceTimer = useRef<number>(undefined);
@@ -165,6 +166,7 @@ export function Character({ mood, headline, subtext }: CharacterProps) {
       </div>
       <p className="character-headline">{headline}</p>
       <p className="character-subtext">{subtext}</p>
+      {hint && <p className="character-hint">{hint}</p>}
     </div>
   );
 }

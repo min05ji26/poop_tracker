@@ -81,13 +81,6 @@ export async function deleteRecord(id: string): Promise<void> {
   await Storage.setItem(RECORDS_KEY, JSON.stringify(filtered));
 }
 
-export async function getLastRecordDate(): Promise<Date | null> {
-  const records = await loadRecords();
-  if (records.length === 0) return null;
-  const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
-  return new Date(sorted[0].date);
-}
-
 export interface Profile {
   nickname: string;
   birthdate: string; // YYYY.MM.DD

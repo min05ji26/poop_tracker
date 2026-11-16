@@ -74,3 +74,10 @@
   color: var(--color-text-sub);
   text-align: center;
 }
+
+.character-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--color-text-disabled);
+  text-align: center;
+}

@@ -4,7 +4,7 @@ import { Calendar } from './components/Calendar';
 import { Record } from './components/Record';
 import { Onboarding } from './components/Onboarding';
 import { getCharacterStatus } from './character';
-import { getLastRecordDate, loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
+import { loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
@@ -31,7 +31,7 @@ function getHomeSummary(records: PoopRecord[]): HomeSummary {
 
 function App() {
   const [screen, setScreen] = useState<Screen>('loading');
-  const [status, setStatus] = useState(() => getCharacterStatus(null));
+  const [status, setStatus] = useState(() => getCharacterStatus([]));
   const [summary, setSummary] = useState<HomeSummary>({ recordedToday: false, monthRecordDays: 0 });
   const [recordDate, setRecordDate] = useState(() => new Date());
   const [calendarFocusDate, setCalendarFocusDate] = useState<Date | null>(null);
@@ -83,10 +83,10 @@ function App() {
   }, [screen, goHome, goCalendar]);
 
   function refreshCharacterStatus() {
-    getLastRecordDate().then((lastRecordDate) => {
-      setStatus(getCharacterStatus(lastRecordDate));
+    loadRecords().then((records) => {
+      setStatus(getCharacterStatus(records));
+      setSummary(getHomeSummary(records));
     });
-    loadRecords().then((records) => setSummary(getHomeSummary(records)));
   }
 
   function handleOnboardingComplete(newNickname: string) {
@@ -129,7 +129,7 @@ function App() {
             </p>
             <p className="greeting-message">{greetingMessage}</p>
           </div>
-          <Character mood={status.mood} headline={status.headline} subtext={status.subtext} />
+          <Character mood={status.mood} headline={status.headline} subtext={status.subtext} hint={status.hint} />
           <div className="home-summary">
             <div className="home-summary-item">
               <span className="home-summary-label">오늘 기록</span>
