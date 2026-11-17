@@ -1,36 +1,19 @@
 import { useEffect, useState } from 'react';
 import { loadRecords, type PoopRecord } from '../storage';
-import { getMonthlyReport, type LabelCount, type MonthlyComparison, type MonthlyStats } from '../stats';
+import { getMonthlyReport, type LabelCount } from '../stats';
+import { comparisonLines, formatInterval, formatPercent } from '../statsFormat';
+import { getSummaryImageContent, saveSummaryImage, type SaveResult } from '../summaryImage';
+import { AppDialog } from './AppDialog';
 import { getColorHex } from '../colorSwatches';
 import './Stats.css';
 
-// 숫자는 전부 stats.ts가 계산하고, 이 화면은 반올림해서 보여주기만 해요
+// 숫자는 전부 stats.ts가 계산하고, 이 화면은 statsFormat.ts로 문구만 만들어요
 
-function formatInterval(hours: number): string {
-  if (hours < 48) return `${Math.round(hours)}시간`;
-  return `${(hours / 24).toFixed(1)}일`;
-}
-
-function formatPercent(ratio: number): string {
-  return `${Math.round(ratio * 100)}%`;
-}
-
-// 이번 달이 다 안 지났을 수 있어서 총 횟수 대신 주 평균·평균 간격으로 비교해요
-function comparisonLines(prev: MonthlyStats, diff: MonthlyComparison): string[] {
-  if (prev.totalCount === 0) return ['지난달 기록이 없어서 비교할 수 없어요'];
-
-  const lines: string[] = [];
-  const weekly = Math.round(diff.weeklyAverageDiff * 10) / 10;
-  if (weekly === 0) lines.push('주 평균 횟수는 지난달과 비슷해요');
-  else lines.push(`주 평균 ${Math.abs(weekly)}회 ${weekly > 0 ? '더 많아요' : '더 적어요'}`);
-
-  if (diff.meanIntervalHoursDiff !== null) {
-    const hours = Math.round(diff.meanIntervalHoursDiff);
-    if (hours === 0) lines.push('기록 간격은 지난달과 비슷해요');
-    else lines.push(`기록 간격이 ${formatInterval(Math.abs(hours))} ${hours > 0 ? '길어졌어요' : '짧아졌어요'}`);
-  }
-  return lines;
-}
+const SAVE_MESSAGES: Record<SaveResult, string> = {
+  saved: '사진첩에 저장했어요. 친구에게 자랑해 보세요!',
+  unsupported: '지금 토스 앱 버전에서는 이미지 저장을 지원하지 않아요. 토스 앱을 최신 버전으로 업데이트해 주세요.',
+  failed: '이미지를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
+};
 
 interface BarListProps<T extends string> {
   title: string;
@@ -69,6 +52,8 @@ export function Stats() {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [records, setRecords] = useState<PoopRecord[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saveResult, setSaveResult] = useState<SaveResult | null>(null);
 
   useEffect(() => {
     loadRecords().then(setRecords);
@@ -76,6 +61,12 @@ export function Stats() {
 
   const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
   const { current, previous, vsLastMonth } = getMonthlyReport(records, year, month, today);
+
+  async function handleSaveImage() {
+    setSaving(true);
+    setSaveResult(await saveSummaryImage(getSummaryImageContent({ current, previous, vsLastMonth }, today)));
+    setSaving(false);
+  }
 
   function moveMonth(delta: number) {
     const target = new Date(year, month + delta, 1);
@@ -158,8 +149,19 @@ export function Stats() {
               note={`걸린 시간을 남긴 기록 ${current.durationInputCount}개 기준이에요 (전체의 ${formatPercent(current.durationInputRate)})`}
             />
           )}
+
+          <button type="button" className="btn-primary" onClick={handleSaveImage} disabled={saving}>
+            {saving ? '저장하는 중...' : '요약 이미지 저장하기'}
+          </button>
+          <p className="stats-note stats-save-note">메모는 이미지에 들어가지 않아요</p>
         </>
       )}
+
+      <AppDialog
+        open={saveResult !== null}
+        message={SAVE_MESSAGES[saveResult ?? 'saved']}
+        onConfirm={() => setSaveResult(null)}
+      />
     </div>
   );
 }
