@@ -1,0 +1,182 @@
+.stats-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.stats-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+.stats-month-arrow {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text-sub);
+  cursor: pointer;
+  padding: 0 0 2px;
+}
+
+/* 다음 달 화살표도 흐리게나마 보이게 해서 ‹ 하나만 남아 뒤로가기 버튼처럼 보이지 않게 해요 */
+.stats-month-arrow:disabled {
+  color: var(--color-text-disabled);
+  cursor: default;
+}
+
+.stats-month-label {
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stats-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+}
+
+.stats-summary-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.stats-summary-value {
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-text);
+}
+
+.stats-summary-unit {
+  margin-left: 4px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.stats-section-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-text);
+}
+
+.stats-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.stats-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stats-bar-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.stats-bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text);
+}
+
+.stats-swatch {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.stats-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.stats-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+
+.stats-bar-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.stats-bar-percent {
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.stats-note {
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.stats-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.stats-empty-title {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-text);
+}
+
+.stats-empty-sub {
+  font-size: 14px;
+  color: var(--color-text-sub);
+}

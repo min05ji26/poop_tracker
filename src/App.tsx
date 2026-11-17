@@ -3,13 +3,14 @@ import { Character } from './components/Character';
 import { Calendar } from './components/Calendar';
 import { Record } from './components/Record';
 import { Onboarding } from './components/Onboarding';
+import { Stats } from './components/Stats';
 import { getCharacterStatus } from './character';
 import { loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
 
-type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record';
+type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats';
 
 interface HomeSummary {
   recordedToday: boolean;
@@ -70,7 +71,7 @@ function App() {
 
   useEffect(() => {
     backHandlerRef.current = () => {
-      if (screen === 'calendar') {
+      if (screen === 'calendar' || screen === 'stats') {
         goHome();
       } else if (screen === 'record') {
         // 기록 화면은 미저장 확인을 포함한 자체 핸들러를 씀
@@ -161,11 +162,15 @@ function App() {
           >
             달력 보기
           </button>
+          <button type="button" className="btn-secondary" onClick={() => setScreen('stats')}>
+            이번 달 통계 보기
+          </button>
         </>
       )}
       {screen === 'calendar' && (
         <Calendar focusDate={calendarFocusDate} onNewRecord={handleNewRecord} onEditRecord={handleEditRecord} />
       )}
+      {screen === 'stats' && <Stats />}
       {screen === 'record' && (
         <Record
           date={recordDate}
