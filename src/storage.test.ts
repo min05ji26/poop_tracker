@@ -1,6 +1,6 @@
 import { Storage } from '@apps-in-toss/web-framework';
 import { describe, expect, it } from 'vitest';
-import { loadRecords, migrateRecords, saveRecord } from './storage';
+import { AI_CONSENT_VERSION, isAiConsentActive, loadAiConsent, loadRecords, migrateRecords, saveAiConsent, saveRecord } from './storage';
 
 // 출시된 v1이 저장하던 형식 그대로 (hasTime 없음, date는 그날 0시)
 const V1_RECORDS = [
@@ -91,5 +91,25 @@ describe('loadRecords', () => {
     await storeV1Records();
 
     expect((await loadRecords()).every((r) => r.hasTime === false)).toBe(true);
+  });
+});
+
+describe('AI 한 줄 평 동의', () => {
+  it('처음엔 동의 안 한 상태', async () => {
+    expect(isAiConsentActive(await loadAiConsent())).toBe(false);
+  });
+
+  it('동의하면 켜지고, 철회하면 꺼진다 (시각도 남긴다)', async () => {
+    await saveAiConsent(true, new Date('2026-11-24T01:00:00Z'));
+    const agreed = await loadAiConsent();
+    expect(isAiConsentActive(agreed)).toBe(true);
+    expect(agreed?.at).toBe('2026-11-24T01:00:00.000Z');
+
+    await saveAiConsent(false);
+    expect(isAiConsentActive(await loadAiConsent())).toBe(false);
+  });
+
+  it('예전 버전 문구에 한 동의는 무효', () => {
+    expect(isAiConsentActive({ agreed: true, version: AI_CONSENT_VERSION - 1, at: '' })).toBe(false);
   });
 });

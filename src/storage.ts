@@ -97,3 +97,32 @@ export async function loadProfile(): Promise<Profile | null> {
 export async function saveProfile(profile: Profile): Promise<void> {
   await Storage.setItem(PROFILE_KEY, JSON.stringify(profile));
 }
+
+// ───────────── AI 한 줄 평 동의 ─────────────
+// 동의 문구(보내는 항목·국외 이전 등)를 바꾸면 버전을 올려서 다시 동의받는다
+export const AI_CONSENT_VERSION = 1;
+
+export interface AiConsent {
+  agreed: boolean;
+  version: number;
+  at: string; // 동의·철회한 시각 (ISO)
+}
+
+const AI_CONSENT_KEY = 'poop_ai_consent';
+
+export async function loadAiConsent(): Promise<AiConsent | null> {
+  const raw = await Storage.getItem(AI_CONSENT_KEY);
+  if (!raw) return null;
+  return JSON.parse(raw) as AiConsent;
+}
+
+export async function saveAiConsent(agreed: boolean, now: Date = new Date()): Promise<AiConsent> {
+  const consent: AiConsent = { agreed, version: AI_CONSENT_VERSION, at: now.toISOString() };
+  await Storage.setItem(AI_CONSENT_KEY, JSON.stringify(consent));
+  return consent;
+}
+
+// 지금 문구 버전에 동의한 상태일 때만 AI로 통계를 보낼 수 있다
+export function isAiConsentActive(consent: AiConsent | null): boolean {
+  return consent !== null && consent.agreed && consent.version === AI_CONSENT_VERSION;
+}

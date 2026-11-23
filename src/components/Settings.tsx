@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { loadProfile, saveProfile, type Profile } from '../storage';
+import { isAiConsentActive, loadAiConsent, loadProfile, saveAiConsent, saveProfile, type AiConsent, type Profile } from '../storage';
 import { AppDialog } from './AppDialog';
 import './Settings.css';
 
@@ -9,17 +9,26 @@ interface SettingsProps {
   onBack: () => void;
   registerBackHandler: (handler: (() => void) | null) => void;
   onNicknameChange: (nickname: string) => void;
+  onOpenAiConsent: () => void;
+}
+
+function formatConsentDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
 }
 
 // 앱 설정을 한곳에 모으는 화면. 이후 AI 리포트 동의·앱 잠금도 여기에 추가해요
-export function Settings({ onBack, registerBackHandler, onNicknameChange }: SettingsProps) {
+export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpenAiConsent }: SettingsProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nickname, setNickname] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [aiConsent, setAiConsent] = useState<AiConsent | null>(null);
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   useEffect(() => {
+    loadAiConsent().then(setAiConsent);
     loadProfile().then((loaded) => {
       setProfile(loaded);
       setNickname(loaded?.nickname ?? '');
@@ -83,7 +92,40 @@ export function Settings({ onBack, registerBackHandler, onNicknameChange }: Sett
         </button>
       </section>
 
-      <p className="settings-footnote">모든 기록은 이 기기에만 저장돼요</p>
+      <section className="card settings-section">
+        <h2 className="settings-section-title">AI 한 줄 평</h2>
+        <div className="settings-toggle-row">
+          <div>
+            <p className="settings-toggle-state">{isAiConsentActive(aiConsent) ? '켜짐' : '꺼짐'}</p>
+            <p className="settings-help">
+              {isAiConsentActive(aiConsent) && aiConsent
+                ? `${formatConsentDate(aiConsent.at)}에 동의했어요. 결과지를 만들 때 한 달 통계를 AI에게 보내요`
+                : '켜면 월간 결과지에 마스코트의 한 줄 평이 붙어요'}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="settings-toggle-btn"
+            onClick={() => (isAiConsentActive(aiConsent) ? setShowWithdrawDialog(true) : onOpenAiConsent())}
+          >
+            {isAiConsentActive(aiConsent) ? '끄기' : '켜기'}
+          </button>
+        </div>
+      </section>
+
+      <p className="settings-footnote">기록은 이 기기에만 저장돼요. AI 한 줄 평을 켠 경우에만 한 달 통계가 AI로 전송돼요</p>
+
+      <AppDialog
+        open={showWithdrawDialog}
+        message="AI 한 줄 평을 끌까요? 앞으로는 통계를 보내지 않고, 결과지는 숫자로만 받아요."
+        confirmLabel="끄기"
+        cancelLabel="취소"
+        onConfirm={async () => {
+          setAiConsent(await saveAiConsent(false));
+          setShowWithdrawDialog(false);
+        }}
+        onCancel={() => setShowWithdrawDialog(false)}
+      />
 
       <AppDialog
         open={showLeaveDialog}
