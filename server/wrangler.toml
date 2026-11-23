@@ -1,0 +1,18 @@
+# AI 리포트 중계 서버 (Cloudflare Workers)
+# 비밀값(GEMINI_API_KEY)은 여기 적지 말 것 → 배포: npx wrangler secret put GEMINI_API_KEY / 로컬: .dev.vars
+name = "poop-tracker-ai"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+[vars]
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+# 토스 실서비스 + 콘솔 QR 테스트 (앱인토스 문의 답변 기준)
+ALLOWED_ORIGINS = "https://poop-tracker.apps.tossmini.com,https://poop-tracker.private-apps.tossmini.com"
+# 비용 상한: 사용자당 하루 횟수 / 서버 전체 한 달 횟수 (넘으면 모델을 부르지 않음)
+USER_DAILY_LIMIT = "3"
+GLOBAL_MONTHLY_LIMIT = "600"
+
+# 호출 횟수 카운터 저장용. id는 `npx wrangler kv namespace create RATE_LIMIT` 결과로 교체
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

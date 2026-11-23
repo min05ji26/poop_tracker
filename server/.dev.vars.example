@@ -1,0 +1,6 @@
+# 이 파일을 .dev.vars 로 복사해서 키를 넣으세요 (.dev.vars 는 git에 올라가지 않아요)
+GEMINI_API_KEY=여기에_발급받은_키
+# 로컬 앱(npm run dev)에서 호출하려면 localhost 도 허용
+ALLOWED_ORIGINS=http://localhost:5173,https://poop-tracker.apps.tossmini.com,https://poop-tracker.private-apps.tossmini.com
+# 키 없이 시험할 때는 mock 으로 (가짜 문장을 돌려줌)
+# MODEL_PROVIDER=mock
