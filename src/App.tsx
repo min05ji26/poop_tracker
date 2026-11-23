@@ -4,13 +4,14 @@ import { Calendar } from './components/Calendar';
 import { Record } from './components/Record';
 import { Onboarding } from './components/Onboarding';
 import { Stats } from './components/Stats';
+import { Settings } from './components/Settings';
 import { getCharacterStatus } from './character';
 import { loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
 
-type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats';
+type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings';
 
 interface HomeSummary {
   recordedToday: boolean;
@@ -40,8 +41,8 @@ function App() {
   const [nickname, setNickname] = useState('');
   const [greetingMessage, setGreetingMessage] = useState(() => getRandomGreetingMessage());
   const backHandlerRef = useRef<() => void>(() => closeApp());
-  // 기록 화면이 자기 화면의 뒤로가기 동작(미저장 확인 포함)을 여기에 등록해요
-  const recordBackRef = useRef<(() => void) | null>(null);
+  // 기록·설정 화면이 자기 화면의 뒤로가기 동작(미저장 확인 포함)을 여기에 등록해요
+  const screenBackRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     migrateRecords().then(refreshCharacterStatus);
@@ -62,8 +63,8 @@ function App() {
 
   const goCalendar = useCallback(() => setScreen('calendar'), []);
 
-  const registerRecordBackHandler = useCallback((handler: (() => void) | null) => {
-    recordBackRef.current = handler;
+  const registerScreenBackHandler = useCallback((handler: (() => void) | null) => {
+    screenBackRef.current = handler;
   }, []);
 
   // 토스 내비게이션 바 뒤로가기: 최초 화면이면 앱 종료, 하위 화면이면 앱 내 이동
@@ -75,7 +76,9 @@ function App() {
         goHome();
       } else if (screen === 'record') {
         // 기록 화면은 미저장 확인을 포함한 자체 핸들러를 씀
-        (recordBackRef.current ?? goCalendar)();
+        (screenBackRef.current ?? goCalendar)();
+      } else if (screen === 'settings') {
+        (screenBackRef.current ?? goHome)();
       } else {
         // loading · onboarding · home = 최초 화면 → 미니앱 종료
         closeApp();
@@ -165,18 +168,24 @@ function App() {
           <button type="button" className="btn-secondary" onClick={() => setScreen('stats')}>
             이번 달 통계 보기
           </button>
+          <button type="button" className="home-settings-link" onClick={() => setScreen('settings')}>
+            <span aria-hidden="true">⚙️</span> 설정
+          </button>
         </>
       )}
       {screen === 'calendar' && (
         <Calendar focusDate={calendarFocusDate} onNewRecord={handleNewRecord} onEditRecord={handleEditRecord} />
       )}
       {screen === 'stats' && <Stats />}
+      {screen === 'settings' && (
+        <Settings onBack={goHome} registerBackHandler={registerScreenBackHandler} onNicknameChange={setNickname} />
+      )}
       {screen === 'record' && (
         <Record
           date={recordDate}
           existingRecord={editingRecord}
           onBack={goCalendar}
-          registerBackHandler={registerRecordBackHandler}
+          registerBackHandler={registerScreenBackHandler}
           onSave={handleRecordSaved}
           onDelete={handleRecordDeleted}
         />

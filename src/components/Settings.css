@@ -1,0 +1,83 @@
+.settings-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.settings-title {
+  padding-top: 12px;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.settings-section-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-text);
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.settings-input {
+  width: 100%;
+  height: 52px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: 0 16px;
+  color: var(--color-text);
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.settings-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.settings-help {
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.settings-help-done {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.settings-footnote {
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-text-disabled);
+}
+
+/* 카드 배경(연회색)과 비활성 버튼 색이 같아서 흰색으로 구분 */
+.settings-section .btn-primary:disabled {
+  background: var(--color-surface);
+}

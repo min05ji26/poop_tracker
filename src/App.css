@@ -91,3 +91,18 @@
   font-size: 16px;
   color: var(--color-text-sub);
 }
+
+/* 설정 진입: 헤더 아이콘 대신 홈 맨 아래 작은 링크 (자체 헤더 버튼은 심사 반려 이력) */
+.home-settings-link {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-sub);
+  cursor: pointer;
+}
