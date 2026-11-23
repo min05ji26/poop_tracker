@@ -90,8 +90,11 @@ export async function handleRequest(request: Request, env: Env, model: Model | n
   }
 
   try {
+    const startedAt = Date.now();
     const result = await model.generate(SYSTEM_PROMPT, buildUserPrompt(input));
-    console.log(JSON.stringify({ event: 'generated', inputTokens: result.inputTokens, outputTokens: result.outputTokens }));
+    console.log(
+      JSON.stringify({ event: 'generated', ms: Date.now() - startedAt, inputTokens: result.inputTokens, outputTokens: result.outputTokens })
+    );
 
     const check = checkOutput(result.text, buildStatsLines(input).join('\n'));
     if (!check.ok) {

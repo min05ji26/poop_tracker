@@ -27,6 +27,7 @@ export const BANNED_WORDS = [
   '이상이 있',
   '위험',
   '심각',
+  '건강',
 ];
 
 export function findBannedWord(text: string): string | null {

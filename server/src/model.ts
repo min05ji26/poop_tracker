@@ -10,13 +10,22 @@ export interface Model {
   generate(system: string, user: string): Promise<ModelResult>;
 }
 
+// Gemini 응답이 1회 평균 7초쯤 걸려서 넉넉히 두되, 넘으면 끊고 앱이 기본 문구를 쓰게 한다
+export const MODEL_TIMEOUT_MS = 15_000;
+
 const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-export function createGeminiModel(apiKey: string, model: string, fetcher: typeof fetch = fetch): Model {
+export function createGeminiModel(
+  apiKey: string,
+  model: string,
+  fetcher: typeof fetch = fetch,
+  timeoutMs: number = MODEL_TIMEOUT_MS
+): Model {
   return {
     async generate(system, user) {
       const res = await fetcher(`${GEMINI_ENDPOINT}/${encodeURIComponent(model)}:generateContent`, {
         method: 'POST',
+        signal: AbortSignal.timeout(timeoutMs),
         headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
@@ -46,8 +55,8 @@ export function createGeminiModel(apiKey: string, model: string, fetcher: typeof
 export function createMockModel(): Model {
   return {
     async generate(_system, user) {
-      const total = /총 기록: (\d+)회/.exec(user)?.[1] ?? '0';
-      const weekly = /주 평균: ([\d.]+)회/.exec(user)?.[1] ?? '0';
+      const total = /\[기록\] 총 (\d+)회/.exec(user)?.[1] ?? '0';
+      const weekly = /\[주 평균\] ([\d.]+)회/.exec(user)?.[1] ?? '0';
       return {
         text: `이번 달은 총 ${total}번 기록했어요! 일주일에 ${weekly}번꼴로 꾸준히 찾아와 줬네요. 다음 달에도 같이 기록해요 💩`,
         inputTokens: 0,

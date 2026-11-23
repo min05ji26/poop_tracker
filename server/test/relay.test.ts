@@ -172,6 +172,14 @@ describe('handleRequest', () => {
 });
 
 describe('createGeminiModel', () => {
+  it('제한 시간이 지나면 끊는다', async () => {
+    const hangingFetch = ((_url: string, init: RequestInit) =>
+      new Promise((_resolve, reject) => {
+        init.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+      })) as unknown as typeof fetch;
+    await expect(createGeminiModel('k', 'm', hangingFetch, 20).generate('s', 'u')).rejects.toThrow();
+  });
+
   it('키는 헤더로 보내고 URL에 넣지 않는다, 응답 텍스트·토큰 수를 읽는다', async () => {
     let seenUrl = '';
     let seenKey: string | null = null;
