@@ -17,6 +17,22 @@ interface SettingsProps {
   notice?: string | null; // 다른 화면에서 돌아올 때 보여줄 한 줄 (예: "앱 잠금을 켰어요")
 }
 
+// 켜짐/꺼짐 토글. 누르면 바로 바뀌지 않고 동의·비밀번호 확인 같은 다음 단계를 거친다
+function Switch({ label, checked, onToggle }: { label: string; checked: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      className={`settings-switch ${checked ? 'settings-switch-on' : ''}`}
+      onClick={onToggle}
+    >
+      <span className="settings-switch-knob" />
+    </button>
+  );
+}
+
 function formatConsentDate(iso: string): string {
   const d = new Date(iso);
   return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
@@ -108,50 +124,38 @@ export function Settings({
       </section>
 
       <section className="card settings-section">
-        <h2 className="settings-section-title">AI 한 줄 평</h2>
-        <div className="settings-toggle-row">
+        <div className="settings-switch-row">
           <div>
-            <p className="settings-toggle-state">{isAiConsentActive(aiConsent) ? '켜짐' : '꺼짐'}</p>
+            <h2 className="settings-section-title">AI 한 줄 평</h2>
             <p className="settings-help">
               {isAiConsentActive(aiConsent) && aiConsent
                 ? `${formatConsentDate(aiConsent.at)}에 동의했어요. 결과지를 만들 때 한 달 통계를 AI에게 보내요`
                 : '켜면 월간 결과지에 마스코트의 한 줄 평이 붙어요'}
             </p>
           </div>
-          <button
-            type="button"
-            className="settings-toggle-btn"
-            onClick={() => (isAiConsentActive(aiConsent) ? setShowWithdrawDialog(true) : onOpenAiConsent())}
-          >
-            {isAiConsentActive(aiConsent) ? '끄기' : '켜기'}
-          </button>
+          <Switch
+            label="AI 한 줄 평"
+            checked={isAiConsentActive(aiConsent)}
+            onToggle={() => (isAiConsentActive(aiConsent) ? setShowWithdrawDialog(true) : onOpenAiConsent())}
+          />
         </div>
       </section>
 
       <section className="card settings-section">
-        <h2 className="settings-section-title">앱 잠금</h2>
-        <div className="settings-toggle-row">
+        <div className="settings-switch-row">
           <div>
-            <p className="settings-toggle-state">{lockOn ? '켜짐' : '꺼짐'}</p>
+            <h2 className="settings-section-title">앱 잠금</h2>
             <p className="settings-help">
               {notice ?? (lockOn ? '앱을 열 때마다 비밀번호 4자리를 물어봐요' : '켜면 앱을 열 때 비밀번호 4자리를 물어봐요')}
             </p>
           </div>
-          {!lockOn && (
-            <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('set')}>
-              켜기
-            </button>
-          )}
+          <Switch label="앱 잠금" checked={lockOn} onToggle={() => onOpenLockSetup(lockOn ? 'disable' : 'set')} />
         </div>
         {lockOn && (
-          <div className="settings-lock-actions">
-            <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('change')}>
-              비밀번호 변경
-            </button>
-            <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('disable')}>
-              잠금 해제
-            </button>
-          </div>
+          <button type="button" className="settings-row-link" onClick={() => onOpenLockSetup('change')}>
+            <span>비밀번호 변경</span>
+            <span aria-hidden="true">›</span>
+          </button>
         )}
       </section>
 

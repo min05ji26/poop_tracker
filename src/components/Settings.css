@@ -82,32 +82,8 @@
   background: var(--color-surface);
 }
 
-.settings-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
 
-.settings-toggle-state {
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--color-text);
-  margin-bottom: 4px;
-}
 
-.settings-toggle-btn {
-  flex-shrink: 0;
-  height: 40px;
-  padding: 0 18px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--color-primary);
-  cursor: pointer;
-}
 
 .settings-link {
   align-self: center;
@@ -120,11 +96,65 @@
   cursor: pointer;
 }
 
-.settings-lock-actions {
+.settings-switch-row {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-.settings-lock-actions .settings-toggle-btn {
-  flex: 1;
+.settings-switch-row .settings-section-title {
+  margin-bottom: 4px;
+}
+
+/* 토글 스위치 */
+.settings-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-text-disabled);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.settings-switch-on {
+  background: var(--color-primary);
+}
+
+.settings-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease-out;
+}
+
+.settings-switch-on .settings-switch-knob {
+  transform: translateX(20px);
+}
+
+/* 토글 아래 따로 있는 줄 (예: 비밀번호 변경) */
+.settings-row-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 4px;
+  padding: 14px 0 2px;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: transparent;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text);
+  cursor: pointer;
 }
