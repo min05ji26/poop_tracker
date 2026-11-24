@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { saveProfile } from '../storage';
 import { CharacterFace } from './Character';
+import { PrivacyPolicy } from './PrivacyPolicy';
+import { PRIVACY_POLICY_VERSION } from '../privacyPolicy';
 import './Onboarding.css';
 
 interface OnboardingProps {
   onComplete: (nickname: string) => void;
+  registerBackHandler: (handler: (() => void) | null) => void;
 }
 
 const MIN_AGE = 14;
@@ -40,13 +43,21 @@ function calculateAge(birthdate: Date): number {
   return age;
 }
 
-export function Onboarding({ onComplete }: OnboardingProps) {
+export function Onboarding({ onComplete, registerBackHandler }: OnboardingProps) {
   const [nickname, setNickname] = useState('');
   const [birthdateInput, setBirthdateInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [agreePolicy, setAgreePolicy] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
 
-  const canSubmit = nickname.trim().length > 0 && birthdateInput.length === 10 && !saving;
+  // 처리방침을 펼쳐 둔 동안 토스 ‹ 는 처리방침만 닫는다 (평소엔 최초 화면이라 앱 종료)
+  useEffect(() => {
+    registerBackHandler(showPolicy ? () => setShowPolicy(false) : null);
+    return () => registerBackHandler(null);
+  }, [showPolicy, registerBackHandler]);
+
+  const canSubmit = nickname.trim().length > 0 && birthdateInput.length === 10 && agreePolicy && !saving;
 
   async function handleStart() {
     const birthdate = parseBirthdate(birthdateInput);
@@ -62,8 +73,24 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     setError(null);
     setSaving(true);
     const trimmedNickname = nickname.trim();
-    await saveProfile({ nickname: trimmedNickname, birthdate: birthdateInput });
+    await saveProfile({
+      nickname: trimmedNickname,
+      birthdate: birthdateInput,
+      policyVersion: PRIVACY_POLICY_VERSION,
+      policyAgreedAt: new Date().toISOString(),
+    });
     onComplete(trimmedNickname);
+  }
+
+  if (showPolicy) {
+    return (
+      <PrivacyPolicy
+        onClose={() => {
+          setShowPolicy(false);
+          setAgreePolicy(true);
+        }}
+      />
+    );
   }
 
   return (
@@ -104,6 +131,18 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               onChange={(e) => setBirthdateInput(formatBirthdateInput(e.target.value))}
             />
           </label>
+
+          <div className="onboarding-agree">
+            <label className="onboarding-agree-check">
+              <input type="checkbox" checked={agreePolicy} onChange={(e) => setAgreePolicy(e.target.checked)} />
+              <span>
+                <b>[필수]</b> 개인정보 수집·이용에 동의해요
+              </span>
+            </label>
+            <button type="button" className="onboarding-agree-view" onClick={() => setShowPolicy(true)}>
+              보기
+            </button>
+          </div>
 
           {error ? (
             <p className="onboarding-error">{error}</p>

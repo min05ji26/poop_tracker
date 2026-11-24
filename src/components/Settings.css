@@ -108,3 +108,14 @@
   color: var(--color-primary);
   cursor: pointer;
 }
+
+.settings-link {
+  align-self: center;
+  border: none;
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  cursor: pointer;
+}

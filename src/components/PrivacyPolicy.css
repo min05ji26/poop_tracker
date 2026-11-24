@@ -1,0 +1,41 @@
+.privacy-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.privacy-title {
+  padding-top: 12px;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.privacy-sub {
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.privacy-section {
+  padding: 16px 18px;
+}
+
+.privacy-section-title {
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.privacy-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-sub);
+}

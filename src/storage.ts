@@ -84,6 +84,9 @@ export async function deleteRecord(id: string): Promise<void> {
 export interface Profile {
   nickname: string;
   birthdate: string; // YYYY.MM.DD
+  // 처음 시작할 때 동의한 개인정보처리방침 버전·시각 (v2.2 이전 사용자는 없음)
+  policyVersion?: number;
+  policyAgreedAt?: string;
 }
 
 const PROFILE_KEY = 'poop_profile';

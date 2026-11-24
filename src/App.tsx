@@ -6,13 +6,14 @@ import { Onboarding } from './components/Onboarding';
 import { Stats } from './components/Stats';
 import { Settings } from './components/Settings';
 import { AiConsent } from './components/AiConsent';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { getCharacterStatus } from './character';
 import { loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
 
-type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings' | 'aiConsent';
+type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings' | 'aiConsent' | 'privacy';
 
 interface HomeSummary {
   recordedToday: boolean;
@@ -80,6 +81,11 @@ function App() {
         (screenBackRef.current ?? goCalendar)();
       } else if (screen === 'settings') {
         (screenBackRef.current ?? goHome)();
+      } else if (screen === 'privacy') {
+        setScreen('settings');
+      } else if (screen === 'onboarding') {
+        // 처리방침을 펼쳐 둔 경우만 그걸 닫고, 아니면 최초 화면이라 앱 종료
+        (screenBackRef.current ?? closeApp)();
       } else if (screen === 'aiConsent') {
         // 지금은 설정에서만 들어와요 (결과지 화면이 생기면 거기서도 진입)
         setScreen('settings');
@@ -128,7 +134,9 @@ function App() {
 
   return (
     <div id="screen">
-      {screen === 'onboarding' && <Onboarding onComplete={handleOnboardingComplete} />}
+      {screen === 'onboarding' && (
+        <Onboarding onComplete={handleOnboardingComplete} registerBackHandler={registerScreenBackHandler} />
+      )}
       {screen === 'home' && (
         <>
           <div className="home-header">
@@ -187,8 +195,10 @@ function App() {
           registerBackHandler={registerScreenBackHandler}
           onNicknameChange={setNickname}
           onOpenAiConsent={() => setScreen('aiConsent')}
+          onOpenPrivacy={() => setScreen('privacy')}
         />
       )}
+      {screen === 'privacy' && <PrivacyPolicy />}
       {screen === 'aiConsent' && <AiConsent onDone={() => setScreen('settings')} />}
       {screen === 'record' && (
         <Record

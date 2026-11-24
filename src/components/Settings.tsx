@@ -10,6 +10,7 @@ interface SettingsProps {
   registerBackHandler: (handler: (() => void) | null) => void;
   onNicknameChange: (nickname: string) => void;
   onOpenAiConsent: () => void;
+  onOpenPrivacy: () => void;
 }
 
 function formatConsentDate(iso: string): string {
@@ -18,7 +19,7 @@ function formatConsentDate(iso: string): string {
 }
 
 // 앱 설정을 한곳에 모으는 화면. 이후 AI 리포트 동의·앱 잠금도 여기에 추가해요
-export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpenAiConsent }: SettingsProps) {
+export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpenAiConsent, onOpenPrivacy }: SettingsProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nickname, setNickname] = useState('');
   const [saving, setSaving] = useState(false);
@@ -112,6 +113,10 @@ export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpen
           </button>
         </div>
       </section>
+
+      <button type="button" className="settings-link" onClick={onOpenPrivacy}>
+        개인정보처리방침 보기 ›
+      </button>
 
       <p className="settings-footnote">기록은 이 기기에만 저장돼요. AI 한 줄 평을 켠 경우에만 한 달 통계가 AI로 전송돼요</p>
 

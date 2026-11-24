@@ -108,3 +108,40 @@
   text-align: center;
   color: var(--color-danger);
 }
+
+/* 처리방침 필수 동의 */
+.onboarding-agree {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.onboarding-agree-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.onboarding-agree-check input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.onboarding-agree-view {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 6px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  text-decoration: underline;
+  cursor: pointer;
+}
