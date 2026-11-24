@@ -1,8 +1,8 @@
 // 앱 안에서 보여주는 개인정보처리방침. 원본은 노션 "풉트래커 개인정보처리방침 (초안)"
-// ⚠️ 법무 검토 전 초안. 출시 전에 [대괄호] 칸을 채우고, 바꾸면 PRIVACY_POLICY_VERSION을 올려 다시 동의받는다
+// ⚠️ 법무 검토 전 초안. 바꾸면 PRIVACY_POLICY_VERSION을 올려 다시 동의받는다
 
 export const PRIVACY_POLICY_VERSION = 1;
-export const PRIVACY_POLICY_EFFECTIVE_DATE = '[시행일]';
+export const PRIVACY_POLICY_EFFECTIVE_DATE = '2026년 11월 25일';
 
 export interface PolicySection {
   title: string;
@@ -68,8 +68,8 @@ export const PRIVACY_POLICY: PolicySection[] = [
   {
     title: '8. 개인정보 보호책임자',
     items: [
-      '이름: [운영자 이름]',
-      '연락처: [문의 이메일]',
+      '이름: 김민지',
+      '연락처: min05ji26@gmail.com',
       '개인정보침해신고센터 privacy.kisa.or.kr (국번 없이 118), 개인정보분쟁조정위원회 www.kopico.go.kr (1833-6972)',
     ],
   },
