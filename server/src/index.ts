@@ -102,7 +102,7 @@ export async function handleRequest(request: Request, env: Env, model: Model | n
       console.log(JSON.stringify({ event: 'blocked', reason: check.reason }));
       return json({ ok: false, reason: 'blocked' }, 200, cors);
     }
-    return json({ ok: true, text: result.text.trim() }, 200, cors);
+    return json({ ok: true, text: check.text }, 200, cors);
   } catch (e) {
     console.error(JSON.stringify({ event: 'model_error', message: e instanceof Error ? e.message : 'unknown' }));
     return json({ ok: false, reason: 'error' }, 502, cors);

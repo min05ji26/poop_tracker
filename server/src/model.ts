@@ -30,7 +30,7 @@ export function createGeminiModel(
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
           contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 400 },
+          generationConfig: { temperature: 0.9, maxOutputTokens: 200 },
         }),
       });
       if (!res.ok) throw new Error(`gemini ${res.status}`);
@@ -51,14 +51,13 @@ export function createGeminiModel(
   };
 }
 
-// 키 없이 로컬·테스트에서 쓰는 가짜 모델. [통계]의 숫자만 그대로 옮긴다
+// 키 없이 로컬·테스트에서 쓰는 가짜 모델. 많았던 모양으로 한 줄 평을 만든다
 export function createMockModel(): Model {
   return {
     async generate(_system, user) {
-      const total = /\[기록\] 총 (\d+)회/.exec(user)?.[1] ?? '0';
-      const weekly = /\[주 평균\] ([\d.]+)회/.exec(user)?.[1] ?? '0';
+      const shape = /\[많았던 모양\] (\S+)/.exec(user)?.[1] ?? '똥';
       return {
-        text: `이번 달은 총 ${total}번 기록했어요! 일주일에 ${weekly}번꼴로 꾸준히 찾아와 줬네요. 다음 달에도 같이 기록해요 💩`,
+        text: `꾸준히 기록한 ${shape} 수집가 💩`,
         inputTokens: 0,
         outputTokens: 0,
       };

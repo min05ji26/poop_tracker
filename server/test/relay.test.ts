@@ -44,7 +44,6 @@ const sample: ReportInput = {
     { label: '바나나똥', count: 8, ratio: 0.381 },
     { label: '몽글똥', count: 5, ratio: 0.238 },
   ],
-  colors: [{ label: '갈색', count: 11, ratio: 0.524 }],
   timeSlots: [{ label: '아침', count: 13, ratio: 0.619 }],
   durations: [{ label: '보통', count: 8, ratio: 0.444 }],
   durationInputRate: 0.857,
@@ -84,20 +83,26 @@ describe('parseReportInput', () => {
   });
 });
 
-describe('checkOutput', () => {
+describe('checkOutput (한 줄 평)', () => {
   const stats = buildStatsLines(sample).join('\n');
 
-  it('통계에 있는 숫자만 쓴 문장은 통과', () => {
-    expect(checkOutput('이번 달은 21번, 주 평균 8.6회 기록했어요!', stats)).toEqual({ ok: true });
+  it('짧은 한 줄은 통과하고 따옴표는 뗀다', () => {
+    expect(checkOutput('"아침형 바나나 장인의 한 달 🍌"', stats)).toEqual({ ok: true, text: '아침형 바나나 장인의 한 달 🍌' });
   });
 
   it('금지어가 있으면 막는다 (띄어쓰기로 피해도)', () => {
-    expect(checkOutput('병 원에 가보세요', stats).ok).toBe(false);
-    expect(checkOutput('변비가 걱정돼요', stats).ok).toBe(false);
+    expect(checkOutput('병 원 가기 싫은 한 달', stats).ok).toBe(false);
+    expect(checkOutput('장 건강 지킴이', stats).ok).toBe(false);
   });
 
-  it('통계에 없는 숫자를 지어내면 막는다', () => {
-    expect(checkOutput('하루 평균 3번이에요', stats)).toEqual({ ok: false, reason: 'number:3' });
+  it('숫자가 들어가면 막는다', () => {
+    expect(checkOutput('21번 찾아온 바나나 장인', stats)).toEqual({ ok: false, reason: 'has_number' });
+    expect(checkOutput('하루 3번 장인', stats)).toEqual({ ok: false, reason: 'number:3' });
+  });
+
+  it('여러 줄이거나 너무 길면 막는다', () => {
+    expect(checkOutput('첫 줄\n둘째 줄', stats)).toEqual({ ok: false, reason: 'multi_line' });
+    expect(checkOutput('가'.repeat(41), stats)).toEqual({ ok: false, reason: 'too_long' });
   });
 });
 
@@ -142,7 +147,7 @@ describe('handleRequest', () => {
   it('정상 요청이면 문장을 돌려준다 (mock 모델)', async () => {
     const res = await handleRequest(req(sample), env(), createMockModel());
     const body = await res.json();
-    expect(body).toEqual({ ok: true, text: expect.stringContaining('21번') });
+    expect(body).toEqual({ ok: true, text: '꾸준히 기록한 바나나똥 수집가 💩' });
   });
 
   it('client id가 없으면 400', async () => {
@@ -152,7 +157,7 @@ describe('handleRequest', () => {
 
   it('한도를 넘으면 모델을 부르지 않고 429', async () => {
     let calls = 0;
-    const counting: Model = { generate: async () => ((calls += 1), { text: '21번 기록했어요' }) };
+    const counting: Model = { generate: async () => ((calls += 1), { text: '바나나 장인' }) };
     const e = env({ USER_DAILY_LIMIT: '1' });
     await handleRequest(req(sample), e, counting);
     const res = await handleRequest(req(sample), e, counting);
@@ -161,7 +166,7 @@ describe('handleRequest', () => {
   });
 
   it('금지어가 나오면 blocked (문장은 앱에 안 보냄)', async () => {
-    const res = await handleRequest(req(sample), env(), fixedModel('병원에 가보는 건 어때요?'));
+    const res = await handleRequest(req(sample), env(), fixedModel('병원 가기 싫은 한 달'));
     expect(await res.json()).toEqual({ ok: false, reason: 'blocked' });
   });
 

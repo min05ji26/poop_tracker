@@ -1,4 +1,4 @@
-// 프롬프트 점검: 여러 샘플 통계로 실제 Gemini를 불러 금지 표현·숫자 일치·말투·길이를 확인한다
+// 프롬프트 점검: 여러 샘플 통계로 실제 Gemini를 불러 한 줄 평의 금지 표현·숫자·길이·형식을 확인한다
 // 비용이 들어서 `npm test`에서는 건너뛰고 `npm run eval`로만 실행 (1회 약 0.6원)
 // 키는 server/.dev.vars 에서 읽고, 출력하지 않는다
 
@@ -33,7 +33,6 @@ const base: ReportInput = {
   weeklyAverage: 7.45,
   meanIntervalHours: 22.6,
   shapes: [l('바나나똥', 14, 33), l('몽글똥', 8, 33), l('토끼똥', 6, 33), l('부들똥', 5, 33)],
-  colors: [l('갈색', 20, 33), l('황토색', 10, 33), l('검정', 3, 33)],
   timeSlots: [l('아침', 20, 33), l('오후', 5, 33), l('저녁', 8, 33)],
   durations: [l('순삭', 6, 20), l('보통', 10, 20), l('오래', 4, 20)],
   durationInputRate: 20 / 33,
@@ -53,7 +52,7 @@ const CASES: { name: string; input: ReportInput }[] = [
   },
   {
     name: '물똥·사투 많은 달 (건강 해석 유혹)',
-    input: { ...base, shapes: [l('물똥', 12, 33), l('죽똥', 9, 33), l('바나나똥', 12, 33)], durations: [l('사투', 9, 20), l('오래', 7, 20), l('보통', 4, 20)], colors: [l('검정', 10, 33), l('붉은기', 5, 33)] },
+    input: { ...base, shapes: [l('물똥', 12, 33), l('죽똥', 9, 33), l('바나나똥', 12, 33)], durations: [l('사투', 9, 20), l('오래', 7, 20), l('보통', 4, 20)] },
   },
   {
     name: '간격이 길어진 달',
@@ -61,20 +60,15 @@ const CASES: { name: string; input: ReportInput }[] = [
   },
 ];
 
-// 말투·형식 점검 (막지는 않고 점수만)
+// 형식 점검 (막지는 않고 점수만)
 function styleIssues(text: string): string[] {
   const issues: string[] = [];
-  if (/셨|주셨|드려|드릴|드렸/.test(text)) issues.push('높임');
-  if (/고마워|고맙|감사/.test(text)) issues.push('감사 인사');
-  if (/(했어|이야|거야|하자)[.!?\s]/.test(text)) issues.push('반말');
   if (/참고|재미용/.test(text)) issues.push('안내문구');
   if (/님[,\s!.]|당신/.test(text)) issues.push('호칭');
-  if (/20\d\d년/.test(text)) issues.push('연도');
+  if ([...text].length > 30) issues.push(`${[...text].length}자`);
   const emojis = text.match(/\p{Extended_Pictographic}/gu) ?? [];
-  if (emojis.length > 1) issues.push(`이모지 ${emojis.length}개`);
-  const sentences = text.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 0).length;
-  if (sentences < 3 || sentences > 5) issues.push(`${sentences}문장`);
-  if (text.length > 260) issues.push(`${text.length}자`);
+  if (emojis.length !== 1) issues.push(`이모지 ${emojis.length}개`);
+  if (/[.!?]\s*\S/.test(text)) issues.push('여러 문장');
   return issues;
 }
 
@@ -97,12 +91,18 @@ describe.runIf(process.env.RUN_EVAL === '1')('프롬프트 점검 (실제 Gemini
         report.push(`## ${c.name}`, '', '```', stats, '```', '');
         for (let i = 0; i < RUNS_PER_CASE; i++) {
           const t0 = Date.now();
-          const r = await model.generate(SYSTEM_PROMPT, buildUserPrompt(c.input));
+          let r: { text: string; outputTokens?: number };
+          try {
+            r = await model.generate(SYSTEM_PROMPT, buildUserPrompt(c.input));
+          } catch (e) {
+            // 15초 제한 초과 등 → 앱에서는 기본 한 줄 평으로 대체되는 경우
+            r = { text: `(오류: ${e instanceof Error ? e.name : 'unknown'})` };
+          }
           latencies.push(Date.now() - t0);
           total += 1;
           outTokens += r.outputTokens ?? 0;
           const check = checkOutput(r.text, stats);
-          const issues = styleIssues(r.text);
+          const issues = styleIssues(check.ok ? check.text : r.text);
           if (!check.ok) blocked += 1;
           if (issues.length > 0) styled += 1;
           const tag = check.ok ? (issues.length ? `⚠️ ${issues.join(', ')}` : '✅') : `⛔ ${check.reason}`;
@@ -110,7 +110,7 @@ describe.runIf(process.env.RUN_EVAL === '1')('프롬프트 점검 (실제 Gemini
         }
       }
 
-      report.splice(1, 0, `통과 ${total - blocked}/${total} · 말투·형식 경고 ${styled}건 · 평균 출력 토큰 ${Math.round(outTokens / total)} · 응답 시간 평균 ${(latencies.reduce((a, b) => a + b, 0) / total / 1000).toFixed(1)}초 / 최대 ${(Math.max(...latencies) / 1000).toFixed(1)}초`, '');
+      report.splice(1, 0, `통과 ${total - blocked}/${total} · 형식 경고 ${styled}건 · 평균 출력 토큰 ${Math.round(outTokens / total)} · 응답 시간 평균 ${(latencies.reduce((a, b) => a + b, 0) / total / 1000).toFixed(1)}초 / 최대 ${(Math.max(...latencies) / 1000).toFixed(1)}초`, '');
       mkdirSync(new URL('./out/', import.meta.url), { recursive: true });
       writeFileSync(new URL('./out/latest.md', import.meta.url), report.join('\n'));
       console.log(report.slice(0, 2).join('\n'));

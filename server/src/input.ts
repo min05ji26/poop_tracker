@@ -1,8 +1,8 @@
 // 앱이 보내는 리포트 입력. 숫자는 전부 앱(stats.ts)이 계산한 값이고, 서버·LLM은 계산하지 않는다
-// 자유 텍스트(메모 등)는 받지 않는다 → 프롬프트 주입 여지도 없음. 냄새·닉네임·생년월일도 없음
+// 자유 텍스트(메모 등)는 받지 않는다 → 프롬프트 주입 여지도 없음. 냄새·색·닉네임·생년월일도 없음
+// (색은 검정·붉은기 같은 건강 해석을 부르기 쉬워 동의 화면에서도 "보내지 않는 것"으로 안내)
 
 export const SHAPE_LABELS = ['토끼똥', '방울똥', '바나나똥', '부들똥', '몽글똥', '죽똥', '물똥'] as const;
-export const COLOR_LABELS = ['갈색', '황토색', '검정', '붉은기', '녹색', '기타'] as const;
 export const DURATION_LABELS = ['순삭', '보통', '오래', '사투'] as const;
 export const TIME_SLOTS = ['새벽', '아침', '오후', '저녁'] as const;
 
@@ -21,7 +21,6 @@ export interface ReportInput {
   weeklyAverage: number;
   meanIntervalHours: number | null;
   shapes: LabelRatio[];
-  colors: LabelRatio[];
   timeSlots: LabelRatio[];
   durations: LabelRatio[]; // 비율 분모 = 걸린 시간을 입력한 기록 수
   durationInputRate: number; // 0~1
@@ -63,10 +62,9 @@ export function parseReportInput(body: unknown): ReportInput | null {
   if (!isNum(b.durationInputRate, 0, 1)) return null;
 
   const shapes = parseLabelList(b.shapes, SHAPE_LABELS);
-  const colors = parseLabelList(b.colors, COLOR_LABELS);
   const timeSlots = parseLabelList(b.timeSlots, TIME_SLOTS);
   const durations = parseLabelList(b.durations, DURATION_LABELS);
-  if (!shapes || !colors || !timeSlots || !durations) return null;
+  if (!shapes || !timeSlots || !durations) return null;
 
   let vsLastMonth: ReportInput['vsLastMonth'] = null;
   if (b.vsLastMonth !== null && b.vsLastMonth !== undefined) {
@@ -86,7 +84,6 @@ export function parseReportInput(body: unknown): ReportInput | null {
     weeklyAverage: b.weeklyAverage,
     meanIntervalHours: b.meanIntervalHours,
     shapes,
-    colors,
     timeSlots,
     durations,
     durationInputRate: b.durationInputRate,

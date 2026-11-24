@@ -42,12 +42,23 @@ export function findUnknownNumber(text: string, statsText: string): string | nul
   return used.find((n) => !allowed.has(n)) ?? null;
 }
 
-export function checkOutput(text: string, statsText: string): { ok: true } | { ok: false; reason: string } {
-  if (text.trim().length === 0) return { ok: false, reason: 'empty' };
-  if (text.length > 600) return { ok: false, reason: 'too_long' };
-  const banned = findBannedWord(text);
+export const MAX_LINE_LENGTH = 40;
+
+// 한 줄 평 검사. 통과하면 앞뒤 따옴표를 뗀 문장을 돌려준다
+export function checkOutput(
+  text: string,
+  statsText: string
+): { ok: true; text: string } | { ok: false; reason: string } {
+  const line = text.trim().replace(/^["'“”‘’「」]+|["'“”‘’「」]+$/g, '').trim();
+  if (line.length === 0) return { ok: false, reason: 'empty' };
+  if (/\n/.test(line)) return { ok: false, reason: 'multi_line' };
+  if ([...line].length > MAX_LINE_LENGTH) return { ok: false, reason: 'too_long' };
+  const banned = findBannedWord(line);
   if (banned) return { ok: false, reason: `banned:${banned}` };
-  const unknown = findUnknownNumber(text, statsText);
-  if (unknown) return { ok: false, reason: `number:${unknown}` };
-  return { ok: true };
+  // 한 줄 평에는 숫자를 쓰지 않는다 (숫자는 결과지 표에). 혹시 쓰면 통계에 있는 숫자인지라도 확인
+  if (/\d/.test(line)) {
+    const unknown = findUnknownNumber(line, statsText);
+    return { ok: false, reason: unknown ? `number:${unknown}` : 'has_number' };
+  }
+  return { ok: true, text: line };
 }
