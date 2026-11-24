@@ -40,15 +40,15 @@ export const PRIVACY_POLICY: PolicySection[] = [
     title: '4. 보유 기간과 파기',
     items: [
       '기기에 저장된 정보: 이용자가 지우거나 토스 앱에서 미니앱 데이터를 삭제할 때까지 기기에 남아요.',
-      'AI로 보낸 통계: 운영자의 중계 서버는 내용을 저장·기록하지 않아요. Google은 유료 API로 받은 내용을 AI 학습에 쓰지 않으며, 보관은 Gemini API 약관에 따라요.',
+      'AI로 보낸 통계: 운영자의 중계 서버는 내용을 저장·기록하지 않아요. Google은 유료 API로 받은 내용을 AI 학습에 쓰지 않고, 오남용 확인 목적으로만 최대 55일 보관한 뒤 지워요.',
       '호출 횟수 기록: 익명 식별자와 날짜별 호출 횟수를 최대 2일 보관한 뒤 자동으로 지워요.',
     ],
   },
   {
     title: '5. 처리 위탁 및 국외 이전 (AI 한 줄 평 동의 시)',
     items: [
-      'Cloudflare, Inc. (미국 등): 중계 서버 운영 — 통계 전달, 호출 횟수 제한',
-      'Google LLC (미국 등): AI 한 줄 평 생성(Gemini API) — 통계 숫자만 전달',
+      'Cloudflare, Inc. (미국 등): 중계 서버 운영 — 통계 전달, 호출 횟수 제한 / 문의 PrivacyQuestions@cloudflare.com',
+      'Google LLC (미국 등): AI 한 줄 평 생성(Gemini API) — 통계 숫자만 전달, 최대 55일 보관 / 문의 support.google.com/policies/contact/general_privacy_form',
       '결과지를 만들 때마다 암호화 통신(HTTPS)으로 전송돼요.',
       '설정 > AI 한 줄 평에서 언제든 끌 수 있고, 끄면 그때부터 보내지 않아요.',
     ],

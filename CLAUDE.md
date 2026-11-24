@@ -54,3 +54,11 @@ v1 앱인토스 출시 완료(2026-10-04) → 지금은 **v2** 단계.
 ## 작업 순서
 Notion 태스크 목록의 v2 순서를 그대로 따를 것. 한 태스크씩 완료하고 확인받은 뒤 다음으로 넘어갈 것.
 디자인만 확인하는 요청이면 빌드하지 말고 `npm run dev`로 보여줄 것.
+
+## 빌드 전 확인 (AI 리포트 포함 빌드, v2.2~)
+빌드(`npm run build`)하기 전에 사용자에게 아래를 먼저 알리고 확인받을 것.
+1. Gemini API **유료 등급** 결제 연결 (무료 등급은 입력이 학습에 쓰여 처리방침과 어긋남)
+2. Google Cloud에서 API 키를 Generative Language API로만 제한
+3. AI Studio 로그·데이터 공유 끄기
+4. Google·Cloudflare 계정 2단계 인증, 예산 알림 5,000원
+5. 중계 서버 배포(`server/README.md`) + 앱 `VITE_AI_RELAY_URL` 설정

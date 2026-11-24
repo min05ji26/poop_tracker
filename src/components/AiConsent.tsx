@@ -23,7 +23,7 @@ const ROWS: { label: string; value: string }[] = [
   { label: '국외 이전', value: '미국 등 해외 서버로 전송돼요. 결과지를 만들 때 한 번씩, 인터넷으로 보내요' },
   {
     label: '보관',
-    value: '풉트래커 서버에는 저장하지 않아요. Google은 유료 API 입력을 AI 학습에 쓰지 않고, 보관은 Gemini API 약관을 따라요',
+    value: '풉트래커 서버에는 저장하지 않아요. Google은 AI 학습에 쓰지 않고, 오남용 확인 목적으로만 최대 55일 보관한 뒤 지워요',
   },
 ];
 
