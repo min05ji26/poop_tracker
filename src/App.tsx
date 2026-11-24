@@ -8,6 +8,9 @@ import { Settings } from './components/Settings';
 import { AiConsent } from './components/AiConsent';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { Report } from './components/Report';
+import { LockScreen } from './components/LockScreen';
+import { LockSetup, type LockSetupMode } from './components/LockSetup';
+import { isLockEnabled } from './appLock';
 import { buildMonthReport, isReportSeen, reportKey } from './report';
 import { getCharacterStatus } from './character';
 import { isAiConsentActive, loadAiConsent, loadProfile, loadRecords, migrateRecords, type AiConsent as AiConsentState, type PoopRecord } from './storage';
@@ -16,7 +19,7 @@ import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
 import './components/Report.css';
 
-type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings' | 'aiConsent' | 'privacy' | 'report';
+type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings' | 'aiConsent' | 'privacy' | 'report' | 'locked' | 'lockSetup';
 
 interface HomeSummary {
   recordedToday: boolean;
@@ -50,6 +53,8 @@ function App() {
   const [reportSeen, setReportSeen] = useState(true);
   // AI 동의 화면을 어디서 열었는지 (설정 / 결과지)
   const [consentReturn, setConsentReturn] = useState<'settings' | 'report'>('settings');
+  const [lockSetupMode, setLockSetupMode] = useState<LockSetupMode>('set');
+  const [settingsNotice, setSettingsNotice] = useState<string | null>(null);
   const monthReport = buildMonthReport(records);
   const backHandlerRef = useRef<() => void>(() => closeApp());
   // 기록·설정 화면이 자기 화면의 뒤로가기 동작(미저장 확인 포함)을 여기에 등록해요
@@ -58,10 +63,11 @@ function App() {
   useEffect(() => {
     loadAiConsent().then(setAiConsent);
     migrateRecords().then(refreshCharacterStatus);
-    loadProfile().then((profile) => {
+    Promise.all([loadProfile(), isLockEnabled()]).then(([profile, locked]) => {
       if (profile) {
         setNickname(profile.nickname);
-        setScreen('home');
+        // 앱 잠금이 켜져 있으면 홈 대신 잠금 화면부터
+        setScreen(locked ? 'locked' : 'home');
       } else {
         setScreen('onboarding');
       }
@@ -99,10 +105,12 @@ function App() {
       } else if (screen === 'aiConsent') {
         if (consentReturn === 'report') goHome();
         else setScreen('settings');
+      } else if (screen === 'lockSetup') {
+        setScreen('settings');
       } else if (screen === 'report') {
         goHome();
       } else {
-        // loading · onboarding · home = 최초 화면 → 미니앱 종료
+        // loading · home · locked = 최초 화면 → 미니앱 종료
         closeApp();
       }
     };
@@ -132,6 +140,14 @@ function App() {
   async function handleAiConsentDone() {
     setAiConsent(await loadAiConsent());
     setScreen(consentReturn === 'report' ? 'report' : 'settings');
+  }
+
+  // 비밀번호를 잊어 초기화하면 처음(온보딩)부터
+  function handleLockReset() {
+    setNickname('');
+    setAiConsent(null);
+    refreshCharacterStatus();
+    setScreen('onboarding');
   }
 
   function handleOnboardingComplete(newNickname: string) {
@@ -248,9 +264,25 @@ function App() {
             setScreen('aiConsent');
           }}
           onOpenPrivacy={() => setScreen('privacy')}
+          onOpenLockSetup={(mode) => {
+            setSettingsNotice(null);
+            setLockSetupMode(mode);
+            setScreen('lockSetup');
+          }}
+          notice={settingsNotice}
         />
       )}
       {screen === 'privacy' && <PrivacyPolicy />}
+      {screen === 'locked' && <LockScreen onUnlock={goHome} onReset={handleLockReset} />}
+      {screen === 'lockSetup' && (
+        <LockSetup
+          mode={lockSetupMode}
+          onDone={(message) => {
+            setSettingsNotice(message);
+            setScreen('settings');
+          }}
+        />
+      )}
       {screen === 'aiConsent' && <AiConsent onDone={handleAiConsentDone} />}
       {screen === 'report' && monthReport && (
         <Report report={monthReport} records={records} aiEnabled={isAiConsentActive(aiConsent)} />

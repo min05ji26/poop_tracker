@@ -1,0 +1,112 @@
+.lock-screen {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.lock-mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-surface-muted);
+}
+
+.pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.pin-title {
+  font-weight: 700;
+  font-size: 19px;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.pin-sub {
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.pin-dots {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  background: transparent;
+}
+
+.pin-dot-filled {
+  background: var(--color-primary);
+}
+
+.pin-dots-error .pin-dot {
+  border-color: var(--color-danger);
+}
+
+.pin-error {
+  min-height: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-danger);
+}
+
+.pin-keys {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.pin-key {
+  height: 60px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.pin-key:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.lock-forgot {
+  border: none;
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lock-warning {
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-text-sub);
+}

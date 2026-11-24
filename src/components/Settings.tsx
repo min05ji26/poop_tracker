@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { isAiConsentActive, loadAiConsent, loadProfile, saveAiConsent, saveProfile, type AiConsent, type Profile } from '../storage';
 import { AppDialog } from './AppDialog';
+import { isLockEnabled } from '../appLock';
+import type { LockSetupMode } from './LockSetup';
 import './Settings.css';
 
 const NICKNAME_MAX_LENGTH = 12;
@@ -11,6 +13,8 @@ interface SettingsProps {
   onNicknameChange: (nickname: string) => void;
   onOpenAiConsent: () => void;
   onOpenPrivacy: () => void;
+  onOpenLockSetup: (mode: LockSetupMode) => void;
+  notice?: string | null; // 다른 화면에서 돌아올 때 보여줄 한 줄 (예: "앱 잠금을 켰어요")
 }
 
 function formatConsentDate(iso: string): string {
@@ -19,7 +23,15 @@ function formatConsentDate(iso: string): string {
 }
 
 // 앱 설정을 한곳에 모으는 화면. 이후 AI 리포트 동의·앱 잠금도 여기에 추가해요
-export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpenAiConsent, onOpenPrivacy }: SettingsProps) {
+export function Settings({
+  onBack,
+  registerBackHandler,
+  onNicknameChange,
+  onOpenAiConsent,
+  onOpenPrivacy,
+  onOpenLockSetup,
+  notice,
+}: SettingsProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nickname, setNickname] = useState('');
   const [saving, setSaving] = useState(false);
@@ -27,9 +39,11 @@ export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpen
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [aiConsent, setAiConsent] = useState<AiConsent | null>(null);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
+  const [lockOn, setLockOn] = useState(false);
 
   useEffect(() => {
     loadAiConsent().then(setAiConsent);
+    isLockEnabled().then(setLockOn);
     loadProfile().then((loaded) => {
       setProfile(loaded);
       setNickname(loaded?.nickname ?? '');
@@ -112,6 +126,33 @@ export function Settings({ onBack, registerBackHandler, onNicknameChange, onOpen
             {isAiConsentActive(aiConsent) ? '끄기' : '켜기'}
           </button>
         </div>
+      </section>
+
+      <section className="card settings-section">
+        <h2 className="settings-section-title">앱 잠금</h2>
+        <div className="settings-toggle-row">
+          <div>
+            <p className="settings-toggle-state">{lockOn ? '켜짐' : '꺼짐'}</p>
+            <p className="settings-help">
+              {notice ?? (lockOn ? '앱을 열 때마다 비밀번호 4자리를 물어봐요' : '켜면 앱을 열 때 비밀번호 4자리를 물어봐요')}
+            </p>
+          </div>
+          {!lockOn && (
+            <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('set')}>
+              켜기
+            </button>
+          )}
+        </div>
+        {lockOn && (
+          <div className="settings-lock-actions">
+            <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('change')}>
+              비밀번호 변경
+            </button>
+            <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('disable')}>
+              끄기
+            </button>
+          </div>
+        )}
       </section>
 
       <button type="button" className="settings-link" onClick={onOpenPrivacy}>

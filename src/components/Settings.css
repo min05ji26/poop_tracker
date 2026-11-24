@@ -119,3 +119,12 @@
   color: var(--color-text-sub);
   cursor: pointer;
 }
+
+.settings-lock-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-lock-actions .settings-toggle-btn {
+  flex: 1;
+}
