@@ -28,7 +28,7 @@ export function LockSetup({ mode, onDone }: LockSetupProps) {
         setError(null);
         if (mode === 'disable') {
           await disableLock();
-          onDone('앱 잠금을 껐어요');
+          onDone('앱 잠금을 해제했어요');
         } else {
           setStep('new');
         }

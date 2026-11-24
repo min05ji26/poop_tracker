@@ -149,7 +149,7 @@ export function Settings({
               비밀번호 변경
             </button>
             <button type="button" className="settings-toggle-btn" onClick={() => onOpenLockSetup('disable')}>
-              끄기
+              잠금 해제
             </button>
           </div>
         )}
