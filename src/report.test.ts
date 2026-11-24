@@ -83,3 +83,18 @@ describe('기기 저장', () => {
     expect(await getClientId()).toBe(id);
   });
 });
+
+describe('requestAiLine', () => {
+  const ok = (body: unknown) => (async () => new Response(JSON.stringify(body))) as unknown as typeof fetch;
+
+  it('성공하면 한 줄 평, 막히거나 실패하면 null', async () => {
+    const { requestAiLine } = await import('./aiReport');
+    expect(await requestAiLine({}, 'c_1234567890', { relayUrl: 'http://x', fetcher: ok({ ok: true, text: ' 바나나 장인 🍌 ' }) })).toBe('바나나 장인 🍌');
+    expect(await requestAiLine({}, 'c_1234567890', { relayUrl: 'http://x', fetcher: ok({ ok: false, reason: 'limit' }) })).toBeNull();
+    const failing = (async () => {
+      throw new Error('network');
+    }) as unknown as typeof fetch;
+    expect(await requestAiLine({}, 'c_1234567890', { relayUrl: 'http://x', fetcher: failing })).toBeNull();
+    expect(await requestAiLine({}, 'c_1234567890', { relayUrl: '' })).toBeNull();
+  });
+});

@@ -64,6 +64,7 @@ const CASES: { name: string; input: ReportInput }[] = [
 function styleIssues(text: string): string[] {
   const issues: string[] = [];
   if (/참고|재미용/.test(text)) issues.push('안내문구');
+  if (/(열|십|시)\S{0,2}월|열한|열두/.test(text)) issues.push('달 이름');
   if (/님[,\s!.]|당신/.test(text)) issues.push('호칭');
   if ([...text].length > 30) issues.push(`${[...text].length}자`);
   const emojis = text.match(/\p{Extended_Pictographic}/gu) ?? [];
@@ -96,7 +97,7 @@ describe.runIf(process.env.RUN_EVAL === '1')('프롬프트 점검 (실제 Gemini
             r = await model.generate(SYSTEM_PROMPT, buildUserPrompt(c.input));
           } catch (e) {
             // 15초 제한 초과 등 → 앱에서는 기본 한 줄 평으로 대체되는 경우
-            r = { text: `(오류: ${e instanceof Error ? e.name : 'unknown'})` };
+            r = { text: `(오류: ${e instanceof Error ? e.message : 'unknown'})` };
           }
           latencies.push(Date.now() - t0);
           total += 1;

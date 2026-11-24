@@ -7,13 +7,16 @@ import { Stats } from './components/Stats';
 import { Settings } from './components/Settings';
 import { AiConsent } from './components/AiConsent';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { Report } from './components/Report';
+import { buildMonthReport, isReportSeen, reportKey } from './report';
 import { getCharacterStatus } from './character';
-import { loadProfile, loadRecords, migrateRecords, type PoopRecord } from './storage';
+import { isAiConsentActive, loadAiConsent, loadProfile, loadRecords, migrateRecords, type AiConsent as AiConsentState, type PoopRecord } from './storage';
 import { getRandomGreetingMessage } from './greetings';
 import { onBackButton, closeApp } from './tossBridge';
 import './App.css';
+import './components/Report.css';
 
-type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings' | 'aiConsent' | 'privacy';
+type Screen = 'loading' | 'onboarding' | 'home' | 'calendar' | 'record' | 'stats' | 'settings' | 'aiConsent' | 'privacy' | 'report';
 
 interface HomeSummary {
   recordedToday: boolean;
@@ -42,11 +45,18 @@ function App() {
   const [editingRecord, setEditingRecord] = useState<PoopRecord | null>(null);
   const [nickname, setNickname] = useState('');
   const [greetingMessage, setGreetingMessage] = useState(() => getRandomGreetingMessage());
+  const [records, setRecords] = useState<PoopRecord[]>([]);
+  const [aiConsent, setAiConsent] = useState<AiConsentState | null>(null);
+  const [reportSeen, setReportSeen] = useState(true);
+  // AI 동의 화면을 어디서 열었는지 (설정 / 결과지)
+  const [consentReturn, setConsentReturn] = useState<'settings' | 'report'>('settings');
+  const monthReport = buildMonthReport(records);
   const backHandlerRef = useRef<() => void>(() => closeApp());
   // 기록·설정 화면이 자기 화면의 뒤로가기 동작(미저장 확인 포함)을 여기에 등록해요
   const screenBackRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    loadAiConsent().then(setAiConsent);
     migrateRecords().then(refreshCharacterStatus);
     loadProfile().then((profile) => {
       if (profile) {
@@ -87,20 +97,41 @@ function App() {
         // 처리방침을 펼쳐 둔 경우만 그걸 닫고, 아니면 최초 화면이라 앱 종료
         (screenBackRef.current ?? closeApp)();
       } else if (screen === 'aiConsent') {
-        // 지금은 설정에서만 들어와요 (결과지 화면이 생기면 거기서도 진입)
-        setScreen('settings');
+        if (consentReturn === 'report') goHome();
+        else setScreen('settings');
+      } else if (screen === 'report') {
+        goHome();
       } else {
         // loading · onboarding · home = 최초 화면 → 미니앱 종료
         closeApp();
       }
     };
-  }, [screen, goHome, goCalendar]);
+  }, [screen, goHome, goCalendar, consentReturn]);
 
   function refreshCharacterStatus() {
-    loadRecords().then((records) => {
-      setStatus(getCharacterStatus(records));
-      setSummary(getHomeSummary(records));
+    loadRecords().then((loaded) => {
+      setRecords(loaded);
+      setStatus(getCharacterStatus(loaded));
+      setSummary(getHomeSummary(loaded));
+      const report = buildMonthReport(loaded);
+      if (report) isReportSeen(reportKey(report.current)).then(setReportSeen);
     });
+  }
+
+  // 결과지 배너: AI 동의를 한 번도 정하지 않았으면 동의 화면을 먼저 보여준다
+  function openReport() {
+    setReportSeen(true);
+    if (aiConsent === null) {
+      setConsentReturn('report');
+      setScreen('aiConsent');
+    } else {
+      setScreen('report');
+    }
+  }
+
+  async function handleAiConsentDone() {
+    setAiConsent(await loadAiConsent());
+    setScreen(consentReturn === 'report' ? 'report' : 'settings');
   }
 
   function handleOnboardingComplete(newNickname: string) {
@@ -180,6 +211,24 @@ function App() {
           <button type="button" className="btn-secondary" onClick={() => setScreen('stats')}>
             이번 달 통계 보기
           </button>
+          {monthReport && (
+            <button
+              type="button"
+              className={`report-banner ${reportSeen ? 'report-banner-seen' : ''}`}
+              onClick={openReport}
+            >
+              <span className="report-banner-icon" aria-hidden="true">
+                📮
+              </span>
+              <span className="report-banner-body">
+                {!reportSeen && <span className="report-banner-new">NEW</span>}
+                <span className="report-banner-title">
+                  {monthReport.current.month + 1}월 풉 결과지{reportSeen ? '' : '가 도착했어요'}
+                </span>
+                <span className="report-banner-sub">{reportSeen ? '다시 보기 ›' : '눌러서 받아보기 ›'}</span>
+              </span>
+            </button>
+          )}
           <button type="button" className="home-settings-link" onClick={() => setScreen('settings')}>
             <span aria-hidden="true">⚙️</span> 설정
           </button>
@@ -194,12 +243,18 @@ function App() {
           onBack={goHome}
           registerBackHandler={registerScreenBackHandler}
           onNicknameChange={setNickname}
-          onOpenAiConsent={() => setScreen('aiConsent')}
+          onOpenAiConsent={() => {
+            setConsentReturn('settings');
+            setScreen('aiConsent');
+          }}
           onOpenPrivacy={() => setScreen('privacy')}
         />
       )}
       {screen === 'privacy' && <PrivacyPolicy />}
-      {screen === 'aiConsent' && <AiConsent onDone={() => setScreen('settings')} />}
+      {screen === 'aiConsent' && <AiConsent onDone={handleAiConsentDone} />}
+      {screen === 'report' && monthReport && (
+        <Report report={monthReport} records={records} aiEnabled={isAiConsentActive(aiConsent)} />
+      )}
       {screen === 'record' && (
         <Record
           date={recordDate}
